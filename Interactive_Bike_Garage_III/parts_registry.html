@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive Bike Garage">
+
+
+    <meta property="og:title" content="Interactive Bike Garage">
+    <meta property="og:description" content="Interactive Bike Garage">
+
+
+    <meta name="author" content="Emile Bedard">
+    <meta name="copyright" content="copyright Emile Bedard, project 2 CART 263, 2025">
+
+    <title>Interactive Bike Garage II</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+
+
+
+    <link rel="stylesheet" href="styling/IBG_styles.css">
+    <link rel="stylesheet" href="styling/IBG_styles_parts_registry.css">
+    <link rel="stylesheet" href="styling/IBG_mobile.css">
+
+
+    <!-- Space mono font from google-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+
+    <script src="js/bike.js" defer></script>
+    <script src="js/createBikes.js" defer></script>
+    <script src="js/registerBikeParts.js" defer></script>
+
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.182.0/examples/jsm/"
+          }
+        }
+        </script>
+    <script type="module" src="js/InteractiveBikeGarage2-ThreeJS.js"></script>
+
+</head>
+
+<body>
+    <!-- top banner for title and menu button-->
+    <nav>
+        <div class="banner">
+            <a href="index.html">
+                <h3>Interactive Bike Garage</h3>
+            </a>
+            <div class="banner-buttons">
+                <a href="parts_registry.html">
+                    <button id="registerPartsButton">register parts</button>
+                </a>
+                <a href="maintenance.html">
+                    <button id="maintenanceButton">maintenance</button>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- main zone for all bicycles buttons and the ADD BIKE button-->
+    <div class="bikes-menu">
+
+        <div class="blur-zone">
+            <h2 class="bikes-menu-instructions">Add a new bike or select one to register parts</h2>
+
+            <button class="addBikeButton">
+                <p>ADD BIKE</p>
+
+            </button>
+            <div class="erase-memory-button">
+                <p>ERASE ALL BIKES</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- bike details window that pop's up when user decides to click on add bike -->
+    <div class="bikeDetailsWindow">
+        <h3>Enter bike details</h3>
+        <form id="bikeForm">
+            <label for="bikeName">Bike Name:</label>
+            <input type="text" id="nameInput" placeholder="Your bike name.." required>
+
+            <label for="bikeType">Bike Type:</label>
+            <input type="text" id="typeInput" placeholder="Road, Gravel, mtb... " required>
+
+            <label for="bikeColor">Bike Color:</label>
+            <input type="color" id="colorInput" required>
+
+            <input type="submit" id="submitInput" id="applyBikeButton" value="Submit">
+        </form>
+    </div>
+
+    </div>
+    <div class="partsZone">
+
+        <div class="infographic-zone">
+            <h3 id="infographic-name">ANATOMY OF ...</h3>
+            <div class="bike-overlay">
+                <img src="assets/anatomy-of-a-bike-infographic.png" alt="bike parts infographic" class="infographic">
+                <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+                <!-- svg here for bike frame. will be recolored with selected bike color HEX value-->
+                <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg
+                    width="100%" height="100%" viewBox="0 0 4045 2250" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/"
+                    style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;"
+                    id="empty-frame">
+                    <g>
+                        <path d="M2022.29,1153.85l-599.653,0l302.917,-531.385" />
+                        <path d="M2621.95,1174.33l-152.49,-916.53l302.918,-0.787c-0,0 31.605,117.275 -465.71,117.326" />
+                        <path
+                            d="M2022.29,1153.06l-544.015,-969.794l-160.732,-4.097l160.732,-0l-127.761,36.875l280.25,0" />
+                        <path d="M1643.13,475.745l861.357,-3.472l-482.195,681.572l-379.162,-678.1Z" />
+                    </g>
+                    <rect x="0" y="0" width="4044.42" height="2250" style="fill:none; stroke:none" />
+                </svg>
+
+            </div>
+        </div>
+
+        <div class="toolbox">
+            <h3 class="toolbox-title">TOOLBOX</h3>
+            <h3 class="bike-name-placeholder">NAME PLACEHOLDER</h3>
+            <form id="complete-bike-details">
+                <label for="bikeName">Bike Name:</label>
+                <input type="text" id="toolboxNameInput" placeholder="Your bike name..">
+
+                <label for="bikeType">Bike Type:</label>
+                <input type="text" id="toolboxTypeInput" placeholder="Road, Gravel, mtb... ">
+
+                <label for="bikeHandlebars">Handlebars:</label>
+                <input type="text" id="handlebarsInput" placeholder="dropbars, flatbars ...">
+
+                <label for="bikeFrame">Frame:</label>
+                <input type="text" id="frameInput" placeholder="frame brand ? carbon? steel? aluminium or titanium?">
+
+                <label for="bikeSize">Size:</label>
+                <input type="text" id="sizeInput" placeholder="length of the seat tube, measured in cm.">
+
+                <label for="bikeWheels">Wheels:</label>
+                <input type="text" id="wheelsInput" placeholder="700c? 24/28/32mm ?">
+
+                <label for="bikeTires">Tires:</label>
+                <input type="text" id="tiresInput" placeholder="tire brand?">
+
+                <label for="bikeRearDerailleur">Rear Derailleur:</label>
+                <input type="text" id="rearDerailleurInput" placeholder="Shimano ? Sram ? electronic or mechanical?">
+
+                <label for="bikeFrontDerailleur">Front Derailleur:</label>
+                <input type="text" id="frontDerailleurInput" placeholder="Shimano ? Sram ? electronic or mechanical?">
+
+                <label for="bikeCassette">Cassette:</label>
+                <input type="text" id="cassetteInput" placeholder="number of speeds with tooths. ex: 34t/54t">
+
+                <label for="bikePlateau">Plateau:</label>
+                <input type="text" id="plateauInput" placeholder="brand and number of tooths for gear ratio">
+
+                <label for="bikeCranks">Cranks:</label>
+                <input type="text" id="cranksInput" placeholder="brand ? cranklength in mm ?">
+
+                <label for="bikePedals">Pedals:</label>
+                <input type="text" id="pedalsInput" placeholder="flats? clipless? powermeter">
+
+                <input type="submit" id="submitToolbox" value="Submit">
+            </form>
+            <p class="register-successfull-message">PARTS REGISTERED SUCCESSFULLY!</p>
+        </div>
+
+    </div>
+
+    <div id="canvas-container">
+        <!-- canvas that we custom made-->
+        <canvas id="three-ex"></canvas>
+    </div>
+
+    <div class="empty-placeholder">
+
+    </div>
+</body>
+<footer>
+    <div class="footer-text">
+
+        <h1 class="footer-title">Interactive Bike garage</h1>
+
+        <p>
+            This website is made for cycling enthusiasts to register bike parts, maintain their vehicles and enjoy their
+            passion of
+            cycling. It is meant to be used as a tool for daily bike usage and trips to mechanics shop as a reminder and
+            list of bike parts.
+        </p>
+
+        <p>
+            Emile Bedard, cart 263, winter 2026, project 2. see GitHub for attributions
+        </p>
+    </div>
+</footer>
+
+</html>

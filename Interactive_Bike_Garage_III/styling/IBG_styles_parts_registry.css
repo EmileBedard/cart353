@@ -1,0 +1,330 @@
+.bikes-menu {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+    margin-left: 20px;
+    margin-top: 20px;
+    padding: 10px;
+    gap: 20px;
+    width: 35vw;
+}
+
+.blur-zone {
+    display: flex;
+    flex-wrap: wrap;
+
+    background-color: rgb(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    gap: 30px;
+    padding: 40px;
+    border: none;
+    border-radius: 50px;
+}
+
+.bikes-menu-instructions {
+    width: 100%;
+    text-align: center;
+
+    left: auto;
+    font-family: "Space Mono", monospace;
+    font-weight: 600;
+    font-style: normal;
+    color: white;
+    font-size: 22px;
+}
+
+.erase-memory-button {
+
+    border: white solid 3px;
+    border-radius: 25px;
+    width: 100%;
+    text-align: center;
+    font-family: "Space Mono", monospace;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 15px;
+    color: white;
+    transition: background-color 0.2s ease-in-out;
+    cursor: pointer;
+
+    margin-bottom: 30px;
+}
+
+.erase-memory-button:hover {
+
+    background-color: #FF5100;
+    border: #FF5100 solid 3px;
+}
+
+
+.addBikeButton {
+    display: flex;
+    align-items: center;
+
+    background-color: white;
+    color: black;
+
+    border-radius: 20px;
+    cursor: pointer;
+    width: 100%;
+    height: 10vh;
+    margin: 0px;
+
+    display: flex;
+    justify-content: center;
+
+
+    font-family: "Space Mono", monospace;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 20px;
+}
+
+
+button p {
+    margin: 0px;
+}
+
+.bikeObject {
+    margin: 0px;
+    width: fit-content;
+}
+
+.bikeObject button {
+    position: relative;
+    background-color: #E0D5C3;
+    color: white;
+    padding: 30px;
+    z-index: 3;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    font-family: "Space Mono", monospace;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 20px;
+
+    transition: scale 0.2s ease-in-out;
+}
+
+.bikeObject button:hover {
+    scale: 105%;
+}
+
+.bikeObject button img {
+    width: 200px;
+}
+
+.bikeObject button p {
+    padding: 20px 30px;
+}
+
+.bikeDetailsWindow {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60vw;
+    z-index: 5;
+
+    background-color: #FF5100;
+    color: white;
+
+    border-radius: 20px;
+    font-family: "Space Mono", monospace;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 30px;
+}
+
+.bikeDetailsWindow {
+    padding: 40px;
+    display: none;
+}
+
+input[type=text],
+select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    margin-bottom: 20px;
+    display: inline-block;
+    font-family: "Space Mono", monospace;
+    border: 2px solid grey;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+input[type=submit] {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    margin-top: 40px;
+    display: inline-block;
+    font-family: "Space Mono", monospace;
+    border: none;
+    border-radius: 10px;
+    box-sizing: border-box;
+    color: white;
+    background-color: black;
+    cursor: pointer;
+}
+
+
+.bikeDetailsWindow h3 {
+    color: white;
+    font-family: "Space Mono", monospace;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 40px;
+    margin: 0;
+
+}
+
+.bikeDetailsWindow label {
+    font-size: 20px;
+}
+
+.partsZone {
+    width: 90vw;
+    margin: 30px auto;
+
+    display: none;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 10px;
+    ;
+    padding: 20px;
+
+    background: #E3D5BB;
+    border-radius: 40px;
+}
+
+.infographic-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+#infographic-name {
+    margin-bottom: 100px;
+    color: #FF5100;
+}
+
+.bike-overlay {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+}
+
+.bike-overlay img {
+    width: 100%;
+    height: auto;
+    z-index: 3;
+    display: block;
+}
+
+.bike-overlay svg {
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    height: 100%;
+    stroke: #030033;
+    fill: none;
+    stroke-width: 40px;
+
+}
+
+.toolbox {
+    background: #C7B393;
+    padding: 40px;
+    border-radius: 30px;
+
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.toolbox-title {
+    justify-content: left;
+    border-bottom: 2px solid white;
+    color: white;
+}
+
+.bike-name-placeholder {
+    position: absolute;
+    left: 35%;
+    top: 9%;
+    margin: 0px;
+    color: #030033;
+}
+
+.toolbox form {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    column-gap: 0px;
+}
+
+.toolbox input[type=text] {
+    width: 100%;
+
+    padding: 5px;
+    margin: 3px 0;
+    font-family: "Space Mono", monospace;
+    border: 2px solid grey;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.toolbox input[type=submit] {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    margin-top: 60px;
+    display: inline-block;
+    font-family: "Space Mono", monospace;
+    border: none;
+    border-radius: 10px;
+    box-sizing: border-box;
+    color: white;
+    background-color: #030033;
+    cursor: pointer;
+}
+
+.toolbox input[type=submit]:hover {
+    scale: 105%;
+    background-color: #141076;
+}
+
+.register-successfull-message {
+
+    display: none;
+
+    position: absolute;
+    bottom: 100px;
+    align-self: center;
+
+    font-family: "Space Mono", monospace;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 15px;
+    color: #FF5100;
+}
+
+.toolbox label {
+    font-family: "Space Mono", monospace;
+    color: white;
+    width: fit-content;
+}

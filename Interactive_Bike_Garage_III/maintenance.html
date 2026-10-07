@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive Bike Garage">
+
+
+    <meta property="og:title" content="Interactive Bike Garage">
+    <meta property="og:description" content="Interactive Bike Garage">
+
+
+    <meta name="author" content="Emile Bedard">
+    <meta name="copyright" content="copyright Emile Bedard, project 2 CART 263, 2025">
+
+    <title>Interactive Bike Garage II</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+
+
+
+    <link rel="stylesheet" href="styling/IBG_styles.css">
+    <link rel="stylesheet" href="styling/IBG_styles_parts_registry.css">
+    <link rel="stylesheet" href="styling/IBG_mobile.css">
+
+
+    <!-- Space mono font from google-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+
+    <script src="js/bike.js" defer></script>
+    <script src="js/createBikes.js" defer></script>
+    <script src="js/registerBikeParts.js" defer></script>
+
+</head>
+
+<body>
+    <!-- top banner for title and menu button-->
+    <nav>
+        <div class="banner">
+            <a href="index.html">
+                <h3>Interactive Bike Garage </h3>
+            </a>
+            <div class="banner-buttons">
+                <a href="parts_registry.html">
+                    <button id="registerPartsButton">register parts</button>
+                </a>
+                <a href="maintenance.html">
+                    <button id="maintenanceButton">maintenance</button>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <h1>Maintenance Hot Tips</h1>
+
+        <details>
+            <summary>Replace a punctured tube</summary>
+            <p> Replacing a punctured tube is one of the most common repair any cyclist encounters.<br>
+                <br>
+                1. Start by uninstalling your wheel from your frame using the bolt or quick release lever.<br>
+                2. Empty any remaining air in your inner tube before removing your tire using tire levers.<br>
+                3. Remove or patch the punctured and replace with a sealed innertube that respects your tire and rim
+                dimensions.<br>
+                4. Reinstall your wheel and be very careful to not pinch your new tube. Preferably, don't use tire
+                levers for this step.<br>
+                <br>
+                Voila! Happy riding.
+            </p>
+        </details>
+        <details>
+            <summary>Reroute your chain</summary>
+            <p> Rerouting your chain is common and you need to dive right in and don't be scared of a little grease on
+                your hands.<br>
+                (Pro tip!: Use dishsoap as a great degresear to clean chain grease from your hands)<br>
+                <br>
+                1. Start by pulling in the last Jockey wheel of your derailleur to remove tension from the chain.<br>
+                2. Analyze and locate where the chain is stuck. Get in there and pull!<br>
+                3. Replace chain on the right cassette cog while letting go of your derailleur.<br>
+                4. Spin a few pedal strokes to re-align chain on the right speed that you were set on.<br>
+                <br>
+                Voila! Happy riding.
+            </p>
+        </details>
+        <details>
+            <summary>Check your chain</summary>
+            <p> Check your chain every few months depending on your riding frequency to make sure your chain is still
+                usable. Chains are consumable parts and you want to replce it as soon as it is no longer in great shape
+                to
+                prevent damage on your plateau and cassette wich are much more expensive to replace!<br>
+                <br>
+                Use a chain checker to make sure the chain is in good shape. Your checker tool should not fit in the
+                next chain hole. If so: REPLACE!<br>
+                <br>
+                Voila! Happy riding.
+            </p>
+        </details>
+        <details>
+            <summary>Lube your chain</summary>
+            <p> Chains are mechanical systems that feature metal on metal dynamics. On a bike, everytime two metals
+                meet: YOU SHOULD HAVE GREASE!<br>
+                If you bike casually or don't want to worry about performance --- use standard wet lube made for bike
+                (NEVER use WD-40)<br>
+                If you want to consider more speed and less maintenance, consider waxing your chain! New was drips are
+                becoming more common but you can always use a hot crockpot with wax to coat your chain --- check online
+                for full process, more common for road or gravel bikes.
+            </p>
+        </details>
+        <details>
+            <summary>Clean your bike</summary>
+            <p>
+                A clean bike is a fast bike !<br>
+                <br>
+                1. foam and soap it all ( be careful to not degrease your pivot points or bearings.)<br>
+                2. Spray it all! (same thing here, dont spray your bearings)<br>
+                3. Dry it all! (This is the most important step! Cleaning is great but metal+water=rust, be careful)<br>
+            </p>
+        </details>
+        <details>
+            <summary>Adjust your derailleur</summary>
+            <p> When pedaling, you should not encounter major click sounds or unexpected shifting. If so, you may
+                consider re-alignment of your rear or front derailleur.<br>
+                <br>
+                Derailleur alignment and indexing can be hassle, be patient. You will need to adjust your H, L and B
+                limit screws to reach optimal alignment.<br>
+                <br>
+                1. Start by shifting to your smallest cog. There adjust "H" limit screw to match derailleur position
+                with the cog placement<br>
+                2. Adjust your indexing with your barrel adjuster so that evry speed change makes the derailleur go up
+                or donw one speed<br>
+                3. Shift to your highest gear and adjust the derailleur positionment with the "L" limit screw.<br>
+                4. Finish with adjusting your "B" limit screw so the spacing between the first jockey wheel and smallest
+                cog is enough and nothing rubs.
+            </p>
+        </details>
+        <details>
+            <summary>Uninstall and reinstall your pedals</summary>
+            <p> Uninstalling and reinstalling can be tricky because both sides don't have the same threads and thread
+                direction<br>
+                <br>
+                The Pro tip is the remember the universal rules for pedal threading. rotating using an 8mm hex key on
+                the other side of the cranks or a pedal wrench, you need to turn towards the front of the no matter the
+                side to tighten and toward the rear to loosen<br>
+                <br>FRONT ----> TIGHTEN<br>
+                BACK ---> LOOSEN<br>
+
+            </p>
+        </details>
+    </main>
+
+</body>
+
+<footer>
+    <div class="footer-text">
+
+        <h1 class="footer-title">Interactive Bike garage</h1>
+
+        <p>
+            This website is made for cycling enthusiasts to register bike parts, maintain their vehicles and enjoy their
+            passion of
+            cycling. It is meant to be used as a tool for daily bike usage and trips to mechanics shop as a reminder and
+            list of bike parts.
+        </p>
+
+        <p>
+            Emile Bedard, cart 263, winter 2026, project 1, All original content.
+        </p>
+    </div>
+</footer>
+
+</html>
