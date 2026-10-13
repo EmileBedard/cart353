@@ -1,0 +1,49 @@
+﻿{
+  "version": 8,
+  "name": "Greybeard Offline",
+  "sources": {
+    "versatiles": {
+      "type": "vector",
+      "url": "pmtiles://../data/montreal.pmtiles"
+    }
+  },
+  "glyphs": "https://tiles.versatiles.org/assets/fonts/{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": { "background-color": "#e0e0e0" }
+    },
+    {
+      "id": "water",
+      "type": "fill",
+      "source": "versatiles",
+      "source-layer": "water",
+      "paint": { "fill-color": "#b5c4d0" }
+    },
+    {
+      "id": "landuse",
+      "type": "fill",
+      "source": "versatiles",
+      "source-layer": "landuse",
+      "paint": { "fill-color": "#d5d5d5" }
+    },
+    {
+      "id": "roads",
+      "type": "line",
+      "source": "versatiles",
+      "source-layer": "roads",
+      "paint": {
+        "line-color": "#ffffff",
+        "line-width": 1.5
+      }
+    },
+    {
+      "id": "buildings",
+      "type": "fill",
+      "source": "versatiles",
+      "source-layer": "buildings",
+      "paint": { "fill-color": "#cccccc" }
+    }
+  ]
+}
