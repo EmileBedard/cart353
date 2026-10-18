@@ -5,7 +5,6 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 // setup ---- 
 
@@ -58,52 +57,7 @@ composer.addPass(bloomPass);
 const outputPass = new OutputPass()
 composer.addPass(outputPass);
 
-
-
-// Main Scene ----
-// add gltf model
-let garageModel = null;
-let cabinetModel = null;
-let workbenchModel = null;
-
-loadAndRunModels();
-async function loadAndRunModels(objectsGroup) {
-    try {
-
-        //Load HDR file
-        const loader = new HDRLoader();
-        //const hdrTexture = await loader.loadAsync('assets/drakensberg_solitary_mountain_1k.hdr');
-
-        //map a 360 image
-        // hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
-        //scene.background = hdrTexture;
-
-        //load blender scene from gltf
-        garageModel = await gltfLoader.loadAsync('assets/garage-v0/garage.glb');
-        //load cabinet gltf
-        cabinetModel = await gltfLoader.loadAsync('assets/garage-v0/cabinet.glb');
-        //load workbench gltf
-        workbenchModel = await gltfLoader.loadAsync('assets/garage-v0/workbench.glb');
-
-        let objs = []
-        objs.push(garageModel, cabinetModel, workbenchModel);
-
-        addAndRun(objs)
-
-    }
-    catch (error) {
-        console.log(error.message)
-    }
-}
-
-
-
-const originalBlenderPos = new THREE.Vector3();
-
-
-
-
-// used to resize blendercamera
+// used to resize blendercamera in browser if resizing occurs
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -111,23 +65,46 @@ window.addEventListener('resize', () => {
 });
 
 
+// Main Scene ----
+// add gltf model
+
+let workbenchModel = null;
+
+loadAndRunModels();
+async function loadAndRunModels() {
+    try {
+
+        //load blender scene from gltf
+        const gltf = await gltfLoader.loadAsync('assets/workbench-gltf-IBGIII/InteractiveBikeGarageIII-CART353.glb');
+        console.log(gltf);
+        workbenchModel = gltf.scene // places the scene in the array and not the raw gltf data
+
+        let objs = []
+        objs.push(workbenchModel);
+
+        addAndRun(objs)
+        console.log(objs);
+    }
+    catch (error) {
+        console.log(error.message)
+    }
+}
+
+const originalBlenderPos = new THREE.Vector3();
+
+
 //// main run function ----
 function addAndRun(loadedObjsArray) {
 
-    //garage
-    const garageScene = loadedObjsArray[0].scene; //load blender data and place in the scene
-    scene.add(garageScene);
+    //workbench main scene
+    const workbenchScene = loadedObjsArray[0];
 
-    //cabinet
-    const cabinetObj = loadedObjsArray[1].scene; //load blender data and place in the scene
-    scene.add(cabinetObj);
-
-    //workbench
-    const workbenchObj = loadedObjsArray[2].scene; //load blender data and place in the scene
-    scene.add(workbenchObj);
+    if (workbenchScene) {
+        scene.add(workbenchScene);
+    }
 
     ////camera from blender----
-    let blenderCamera = garageScene.children.find(child => child.isCamera);
+    let blenderCamera = workbenchScene.children.find(child => child.isCamera);
 
     //change between initial and blender cam here
     let usedCam = blenderCamera;
@@ -153,54 +130,7 @@ function addAndRun(loadedObjsArray) {
         console.log("camera not loaded:error")
     }
 
-    // animation mixers ----
-    const mixer1 = new THREE.AnimationMixer(cabinetObj);
-    const mixer2 = new THREE.AnimationMixer(workbenchObj);
 
-    // Access open door animation for cabinet
-    const cabinetClip = loadedObjsArray[1].animations[0];
-    const openDoor = mixer1.clipAction(cabinetClip);
-    openDoor.setLoop(THREE.LoopOnce);
-    openDoor.repetitions = 1000;
-    openDoor.clampWhenFinished = true;
-
-
-    let rpButton = document.getElementById("registerPartsButton");
-
-    rpButton.addEventListener("mouseover", function () {
-        openDoor.timeScale = 1;
-        openDoor.paused = false
-        openDoor.play();
-    })
-
-    rpButton.addEventListener("mouseout", function () {
-        openDoor.timeScale = -1;
-        openDoor.paused = false
-        openDoor.play();
-    })
-
-    // Access open toolbox animation for workbench
-    const workbenchClip = loadedObjsArray[2].animations[0];
-    const openToolbox = mixer2.clipAction(workbenchClip);
-    openToolbox.setLoop(THREE.LoopOnce);
-    openToolbox.repetitions = 1000;
-    openToolbox.clampWhenFinished = true;
-
-
-    let mButton = document.getElementById("maintenanceButton");
-
-
-    mButton.addEventListener("mouseover", function () {
-        openToolbox.timeScale = 1;
-        openToolbox.paused = false
-        openToolbox.play();
-    })
-
-    mButton.addEventListener("mouseout", function () {
-        openToolbox.timeScale = -1;
-        openToolbox.paused = false
-        openToolbox.play();
-    })
 
     let elapsedTime = 0;
     window.requestAnimationFrame(animate);
@@ -210,12 +140,6 @@ function addAndRun(loadedObjsArray) {
         //calculate the difference since last frame
         let deltaTime = (timer - elapsedTime) / 1000; //put in secs
         elapsedTime = timer; //update  new elapsedTime
-
-        //animation mixer
-        if (mixer1 || mixer2) {
-            mixer1.update(deltaTime);
-            mixer2.update(deltaTime);
-        }
 
         composer.render();
         window.requestAnimationFrame(animate);
