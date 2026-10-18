@@ -73,7 +73,7 @@ async function loadAndRunModels(objectsGroup) {
         //Load HDR file
         const loader = new HDRLoader();
         const hdrTexture = await loader.loadAsync('assets/drakensberg_solitary_mountain_1k.hdr');
-        console.log(hdrTexture);
+
         //map a 360 image
         hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
         scene.background = hdrTexture;
@@ -97,20 +97,12 @@ async function loadAndRunModels(objectsGroup) {
 }
 
 
-//// mouse and parallax for blender camera ----
-const mouse = { x: 0, y: 0 };
-const targetPos = new THREE.Vector2(0, 0);
+
 const originalBlenderPos = new THREE.Vector3();
-const movementLimit = 5; // Maximum units the camera shifts
-const dampening = 0.02;    // Smoothness (lower = silkier)
 
 
-////// event listeners for mouse and parallax ----
-window.addEventListener('mousemove', (event) => {
-    // Normalize mouse to -1 to +1
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-});
+
+
 // used to resize blendercamera
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -121,7 +113,7 @@ window.addEventListener('resize', () => {
 
 //// main run function ----
 function addAndRun(loadedObjsArray) {
-    console.log(loadedObjsArray)
+
     //garage
     const garageScene = loadedObjsArray[0].scene; //load blender data and place in the scene
     scene.add(garageScene);
@@ -152,7 +144,7 @@ function addAndRun(loadedObjsArray) {
             originalBlenderPos.copy(blenderCamera.position);
         }
 
-        // Update the aspect ratio to match the current html container dimensions stated in the setup cntainer function
+        // Update the aspect ratio to match the current html container dimensions stated in the setup container function
         camera.aspect = sizes.width / sizes.height;
         camera.updateProjectionMatrix();
         renderPass.camera = camera;
@@ -171,7 +163,7 @@ function addAndRun(loadedObjsArray) {
     openDoor.setLoop(THREE.LoopOnce);
     openDoor.repetitions = 1000;
     openDoor.clampWhenFinished = true;
-    console.log(openDoor);
+
 
     let rpButton = document.getElementById("registerPartsButton");
 
@@ -193,10 +185,10 @@ function addAndRun(loadedObjsArray) {
     openToolbox.setLoop(THREE.LoopOnce);
     openToolbox.repetitions = 1000;
     openToolbox.clampWhenFinished = true;
-    console.log(openToolbox);
+
 
     let mButton = document.getElementById("maintenanceButton");
-    console.log(mButton);
+
 
     mButton.addEventListener("mouseover", function () {
         openToolbox.timeScale = 1;
@@ -220,24 +212,6 @@ function addAndRun(loadedObjsArray) {
         //calculate the difference since last frame
         let deltaTime = (timer - elapsedTime) / 1000; //put in secs
         elapsedTime = timer; //update  new elapsedTime
-
-        //controls camera parallax
-        if (camera.name === "blenderCamera") {
-
-            // calculate offset
-            targetPos.x = mouse.x * movementLimit;
-            targetPos.y = mouse.y * movementLimit;
-
-            // Target position
-            const targetX = originalBlenderPos.x + targetPos.x;
-            const targetY = originalBlenderPos.y + targetPos.y;
-
-            // smooth translation on fictional x/y rectangle
-            camera.position.x += (targetX - camera.position.x) * dampening;
-            camera.position.y += (targetY - camera.position.y) * dampening;
-
-            camera.lookAt(0, 0, 0); // look at bike
-        }
 
         //animation mixer
         if (mixer1 || mixer2) {
