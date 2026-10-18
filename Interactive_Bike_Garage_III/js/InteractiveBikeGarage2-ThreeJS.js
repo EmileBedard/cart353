@@ -72,11 +72,11 @@ async function loadAndRunModels(objectsGroup) {
 
         //Load HDR file
         const loader = new HDRLoader();
-        const hdrTexture = await loader.loadAsync('assets/drakensberg_solitary_mountain_1k.hdr');
+        //const hdrTexture = await loader.loadAsync('assets/drakensberg_solitary_mountain_1k.hdr');
 
         //map a 360 image
-        hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
-        scene.background = hdrTexture;
+        // hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
+        //scene.background = hdrTexture;
 
         //load blender scene from gltf
         garageModel = await gltfLoader.loadAsync('assets/garage-v0/garage.glb');
@@ -201,8 +201,6 @@ function addAndRun(loadedObjsArray) {
         openToolbox.paused = false
         openToolbox.play();
     })
-
-
 
     let elapsedTime = 0;
     window.requestAnimationFrame(animate);
