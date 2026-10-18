@@ -10,7 +10,7 @@
     <meta property="og:description" content="Interactive Bike Garage">
 
     <meta name="author" content="Emile Bedard">
-    <meta name="copyright" content="copyright Emile Bedard, project 2 CART 263, 2025">
+    <meta name="copyright" content="copyright Emile Bedard, CART 353, 2026">
 
     <title>Interactive Bike Garage III</title>
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
@@ -44,38 +44,6 @@
     </script>
     <script type="module" src="js/InteractiveBikeGarage2-ThreeJS.js"></script>
 
-    <style>
-        /* Circular Map Widget Container */
-        #map-circle-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 450px;
-            height: 450px;
-            border-radius: 50%;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            border: 3px solid #ffffff;
-            z-index: 10;
-            /* Keeps it above Three.js canvas */
-        }
-
-        #map {
-            width: 100%;
-            height: 100%;
-        }
-
-        #canvas-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 1;
-        }
-    </style>
-
 </head>
 
 <body>
@@ -106,18 +74,35 @@
         <div id="map"></div>
     </div>
 
-    <!-- Initialize Offline Map inside Circle -->
+
     <script>
-        // 1. Register PMTiles protocol handler
+
         const protocol = new pmtiles.Protocol();
         maplibregl.addProtocol("pmtiles", protocol.tile);
 
-        // 2. Initialize Leaflet map centered over Montreal
+        //Leaflet map centered over Montreal and disable controls
         const map = L.map('map', {
-            zoomControl: false // Optional: hides default zoom buttons for a clean aesthetic
+            zoomControl: false,
+            dragging: false,
+            scrollWheelZoom: false
         }).setView([45.5017, -73.5673], 12);
 
-        // 3. Fetch local greybeard style JSON
+        // prototyping with fixed image ---
+
+        // 2. Define geographic bounds to lock your export image over Montreal
+        // Adjust these coordinates if your image covers a specific neighborhood
+        // const imageBounds = [
+        //     [45.4800, -73.6200], // South-West corner
+        //     [45.5300, -73.5200]  // North-East corner
+        // ];
+
+        // 3. Add local exported JPEG image layer
+        // L.imageOverlay('assets/map-export.svg', imageBounds).addTo(map);
+
+        let maplibreLayer = null;
+        let rotationAngle = 0;
+
+        // Fetch local greybeard style JSON
         fetch('assets/greybeard.json')
             .then(res => res.json())
             .then(style => {
@@ -126,9 +111,28 @@
                 }).addTo(map);
 
                 // Re-evaluate container dimensions inside circle mask
-                setTimeout(() => { map.invalidateSize(); }, 200);
+                setTimeout(() => { map.invalidateSize(); rotateMap() }, 200);
             })
             .catch(err => console.error("Error loading greybeard style:", err));
+
+
+        //rotates the map slowly only if an instance of the map has already been created with script above
+        function rotateMap() {
+            if (maplibreLayer) {
+
+                const glMap = maplibreLayer.getMaplibreMap();
+
+                if (glMap) {
+
+                    rotationAngle = (rotationAngle + 0.05) % 360; //slowly builds the angle and integers at 360deg for looping
+
+                    // Set the heading/bearing of the vector map without animation easing
+                    glMap.setBearing(rotationAngle, { animate: false });
+                }
+            }
+
+            requestAnimationFrame(rotateMap);
+        }
     </script>
 
 </body>

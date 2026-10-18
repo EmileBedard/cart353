@@ -1,37 +1,42 @@
 ﻿{
   "version": 8,
-  "name": "Greybeard Offline",
+  "name": "Greybeard Prototype",
   "sources": {
-    "versatiles": {
+    "protomaps": {
       "type": "vector",
       "url": "pmtiles://../data/montreal.pmtiles"
     }
   },
-  "glyphs": "https://tiles.versatiles.org/assets/fonts/{fontstack}/{range}.pbf",
   "layers": [
     {
       "id": "background",
       "type": "background",
-      "paint": { "background-color": "#e0e0e0" }
+      "paint": {
+        "background-color": "#e0e0e0"
+      }
+    },
+    {
+      "id": "earth",
+      "type": "fill",
+      "source": "protomaps",
+      "source-layer": "earth",
+      "paint": {
+        "fill-color": "#dcdcdc"
+      }
     },
     {
       "id": "water",
       "type": "fill",
-      "source": "versatiles",
+      "source": "protomaps",
       "source-layer": "water",
-      "paint": { "fill-color": "#b5c4d0" }
-    },
-    {
-      "id": "landuse",
-      "type": "fill",
-      "source": "versatiles",
-      "source-layer": "landuse",
-      "paint": { "fill-color": "#d5d5d5" }
+      "paint": {
+        "fill-color": "#b5c4d0"
+      }
     },
     {
       "id": "roads",
       "type": "line",
-      "source": "versatiles",
+      "source": "protomaps",
       "source-layer": "roads",
       "paint": {
         "line-color": "#ffffff",
@@ -41,9 +46,11 @@
     {
       "id": "buildings",
       "type": "fill",
-      "source": "versatiles",
+      "source": "protomaps",
       "source-layer": "buildings",
-      "paint": { "fill-color": "#cccccc" }
+      "paint": {
+        "fill-color": "#cccccc"
+      }
     }
   ]
 }
