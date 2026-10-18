@@ -76,14 +76,12 @@ async function loadAndRunModels() {
 
         //load blender scene from gltf
         const gltf = await gltfLoader.loadAsync('assets/workbench-gltf-IBGIII/InteractiveBikeGarageIII-CART353.glb');
-        console.log(gltf);
         workbenchModel = gltf.scene // places the scene in the array and not the raw gltf data
 
         let objs = []
         objs.push(workbenchModel);
 
-        addAndRun(objs)
-        console.log(objs);
+        addAndRun(objs);
     }
     catch (error) {
         console.log(error.message)
