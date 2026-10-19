@@ -1,0 +1,384 @@
+#define BOOST_GEOMETRY_NO_ROBUSTNESS
+#include "geom.h"
+
+#include <boost/geometry/geometries/segment.hpp>
+#include <boost/geometry/index/rtree.hpp>
+#include <boost/geometry/algorithms/buffer.hpp>
+#include <boost/geometry/strategies/buffer.hpp>
+
+#include "geometry/correct.hpp"
+
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/irange.hpp>
+
+typedef boost::geometry::model::segment<Point> simplify_segment;
+typedef boost::geometry::index::rtree<simplify_segment, boost::geometry::index::quadratic<16>> simplify_rtree;
+
+template<typename GeometryType>
+static inline void simplify_ring(GeometryType const &input, GeometryType &output, double distance, simplify_rtree const &outer_rtree = simplify_rtree())
+{
+    std::deque<std::size_t> nodes(input.size());
+    for(std::size_t i = 0; i < input.size(); ++i)
+        nodes[i] = i;
+
+	simplify_rtree rtree(
+		boost::irange<std::size_t>(0, input.size() - 1)
+		| boost::adaptors::transformed(std::function<simplify_segment(std::size_t)>([&input](std::size_t i) {
+			return simplify_segment(input[i], input[i+1]);
+		})));
+
+    Box envelope; boost::geometry::envelope(input, envelope);
+
+	for(std::size_t pq = input.size() - 2; pq--; ) {
+        auto entry = pq;
+
+        auto start = nodes[entry];
+        auto middle = nodes[entry + 1];
+        auto end = nodes[entry + 2];
+
+        if (input[middle].x()==envelope.min_corner().x() ||
+            input[middle].y()==envelope.min_corner().y() ||
+            input[middle].x()==envelope.max_corner().x() ||
+            input[middle].y()==envelope.max_corner().y()) continue;
+
+        simplify_segment line(input[start], input[end]);
+
+        double max_comp_distance = 0.0;
+		std::size_t max_comp_i = start + 1;
+
+        for(auto i = start + 1; i < end; ++i) {
+			auto comp_distance = boost::geometry::comparable_distance(line, input[i]);
+            if(comp_distance > max_comp_distance) {
+				max_comp_distance = comp_distance;
+				max_comp_i = i;
+			}
+		}
+
+        if(boost::geometry::distance(line, input[max_comp_i]) < distance) {
+			std::size_t query_count = 0;
+            for(auto const &result: rtree | boost::geometry::index::adaptors::queried(boost::geometry::index::intersects(line)))
+				++query_count;
+            for(auto const &result: outer_rtree | boost::geometry::index::adaptors::queried(boost::geometry::index::intersects(line)))
+				++query_count;
+
+			std::size_t expected_count = std::min<std::size_t>(4, nodes.size() - 1);
+            if(query_count == expected_count) {
+                nodes.erase(nodes.begin() + entry + 1);
+                rtree.remove(simplify_segment(input[start], input[middle]));
+                rtree.remove(simplify_segment(input[middle], input[end]));
+                rtree.insert(line);
+            }
+        }
+    }
+
+	output.resize(nodes.size());
+	for(std::size_t i = 0; i < nodes.size(); ++i)
+		output[i] = input[nodes[i]];
+}
+
+Polygon simplify(Polygon const &p, double max_distance) 
+{
+	Polygon result;
+
+	simplify_rtree outer_rtree(
+		boost::irange<std::size_t>(0, p.outer().size() - 1)
+		| boost::adaptors::transformed(std::function<simplify_segment(std::size_t)>([&p](std::size_t i) {
+			return simplify_segment(p.outer()[i], p.outer()[i+1]);
+		})));
+
+	for(auto const &inner: p.inners()) {
+		Ring new_inner;
+		simplify_ring(inner, new_inner, max_distance, outer_rtree);
+
+		std::reverse(new_inner.begin(), new_inner.end());
+		if(new_inner.size() > 3 && boost::geometry::perimeter(new_inner) > 3 * max_distance) {
+			simplify_combine(result.inners(), std::move(new_inner));
+		}
+	}
+
+	simplify_rtree inners_rtree;
+	for(auto &inner: result.inners()) {
+		std::reverse(inner.begin(), inner.end());
+
+		inners_rtree.insert(
+			boost::irange<std::size_t>(0, inner.size() - 1)
+			| boost::adaptors::transformed(std::function<simplify_segment(std::size_t)>([&inner](std::size_t i) {
+				return simplify_segment(inner[i], inner[i+1]);
+			})));
+	}
+
+	simplify_ring(p.outer(), result.outer(), max_distance, inners_rtree);
+	if(result.outer().size() > 3 && boost::geometry::perimeter(result.outer()) > 3 * max_distance) {
+		return result;
+	}
+
+	result = Polygon();
+	return result;
+}
+
+Linestring simplify(Linestring const &ls, double max_distance) 
+{
+	Linestring result;
+	boost::geometry::simplify(ls, result, max_distance);
+	return result;
+}
+
+MultiPolygon simplify(MultiPolygon const &mp, double max_distance) 
+{
+	MultiPolygon result_mp;
+	for(auto const &p: mp) {
+		Polygon new_p = simplify(p, max_distance);
+		if(!new_p.outer().empty()) {
+			geom::correct(new_p);
+			simplify_combine(result_mp, std::move(new_p));
+		}
+	}
+
+	return result_mp;
+}
+
+void make_valid(MultiPolygon &mp)
+{
+	MultiPolygon result;
+	for(auto const &p: mp) {
+		geometry::correct(p, result, 1E-12);
+	}
+	mp = result;
+}
+
+// Repair a single (possibly invalid) polygon in an area-preserving way and
+// append the resulting valid polygon(s) to `out`. Returns true on success.
+// `minArea` is the lower bound on the repaired area we are willing to accept.
+static bool repair_one_polygon(const Polygon &p, double minArea, MultiPolygon &out)
+{
+	// 1) Dissolve (resolves self-intersections of this single polygon).
+	try {
+		MultiPolygon fixed;
+		geometry::correct(p, fixed, 1E-12);
+		if (geom::is_valid(fixed) && std::abs(geom::area(fixed)) >= minArea) {
+			for (auto &fp : fixed) out.push_back(std::move(fp));
+			return true;
+		}
+	} catch (const std::exception &) {
+		// fall through to the buffer attempt
+	}
+
+	// 2) Zero-width buffer as a last resort.
+	try {
+		MultiPolygon buffered;
+		geom::strategy::buffer::distance_symmetric<double> distanceStrategy(0.0);
+		geom::strategy::buffer::side_straight sideStrategy;
+		geom::strategy::buffer::join_miter joinStrategy;
+		geom::strategy::buffer::end_flat endStrategy;
+		geom::strategy::buffer::point_square pointStrategy;
+
+		geom::buffer(p, buffered, distanceStrategy, sideStrategy, joinStrategy, endStrategy, pointStrategy);
+		geom::correct(buffered);
+		if (geom::is_valid(buffered) && std::abs(geom::area(buffered)) >= minArea) {
+			for (auto &bp : buffered) out.push_back(std::move(bp));
+			return true;
+		}
+	} catch (const std::exception &) {
+		// keep best-effort polygon
+	}
+
+	return false;
+}
+
+bool repair_multi_polygon(MultiPolygon &mp)
+{
+	if (geom::is_valid(mp)) return true;
+
+	// Repair PER POLYGON, area-preserving. Running make_valid/buffer on the whole
+	// multipolygon can catastrophically COLLAPSE large/complex inputs: a clipped
+	// reservoir with >1000 rings dropped ~99% of its area, leaving missing lake
+	// tiles at low zoom. Conversely, simply keeping the whole invalid geometry
+	// lets a single self-intersecting ring render as a spurious "spike".
+	//
+	// Fixing each polygon independently gets the best of both: a self-touching
+	// ring is cleaned (no spike) while the rest stays intact, and we avoid the
+	// O(n^2) cross-polygon union that caused the collapse. A polygon whose repair
+	// would not preserve its area is kept as-is (invalid but complete renders;
+	// only a tiny local artefact, never a dropped area).
+	MultiPolygon out;
+	bool allValid = true;
+	for (const auto &p : mp) {
+		if (geom::is_valid(p)) {
+			out.push_back(p);
+			continue;
+		}
+		// Lenient threshold: resolving a self-intersection legitimately changes a
+		// single polygon's (shoelace) area, so anything down to half the original
+		// is accepted. Per-polygon repair cannot trigger the cross-polygon union
+		// that previously caused the catastrophic ~99% collapse, so this only
+		// rejects a genuine local collapse.
+		const double minArea = 0.5 * std::abs(geom::area(p));
+		if (!repair_one_polygon(p, minArea, out)) {
+			out.push_back(p);
+			allValid = false;
+		}
+	}
+
+	mp = std::move(out);
+	return allValid;
+}
+
+// ---------------
+// Union multipolygons
+// Groups polygons into connected components by bbox intersection (via R-tree +
+// union-find), then runs the binary reduction only within each component.
+// Disjoint polygons are concatenated directly, skipping the expensive union_()
+// call that Boost still runs even for non-overlapping geometry.
+void union_many(std::vector<MultiPolygon> &to_unify) {
+	if (to_unify.size() < 2) return;
+
+	namespace bgi = boost::geometry::index;
+	typedef std::pair<Box, size_t> BoxIdx;
+
+	std::vector<Box> boxes(to_unify.size());
+	for (size_t i = 0; i < to_unify.size(); i++)
+		boost::geometry::envelope(to_unify[i], boxes[i]);
+
+	// Union-find with path compression
+	std::vector<size_t> parent(to_unify.size());
+	for (size_t i = 0; i < to_unify.size(); i++) parent[i] = i;
+	std::function<size_t(size_t)> find = [&](size_t x) -> size_t {
+		return parent[x] == x ? x : (parent[x] = find(parent[x]));
+	};
+
+	// Incrementally build an R-tree; unite each polygon with all prior ones
+	// whose bboxes intersect (transitivity is handled by union-find)
+	bgi::rtree<BoxIdx, bgi::quadratic<16>> rtree;
+	for (size_t i = 0; i < to_unify.size(); i++) {
+		if (boost::geometry::is_empty(to_unify[i])) continue;
+		for (auto const &v : rtree | bgi::adaptors::queried(bgi::intersects(boxes[i]))) {
+			size_t ri = find(i), rj = find(v.second);
+			if (ri != rj) parent[ri] = rj;
+		}
+		rtree.insert({boxes[i], i});
+	}
+
+	// Bucket indices by component root (roots are in 0..n-1)
+	std::vector<std::vector<size_t>> components(to_unify.size());
+	for (size_t i = 0; i < to_unify.size(); i++)
+		components[find(i)].push_back(i);
+
+	// Union within each component; concatenate all results into to_unify[0]
+	MultiPolygon result;
+	for (auto &comp : components) {
+		if (comp.empty()) continue;
+		if (comp.size() == 1) {
+			for (auto &p : to_unify[comp[0]]) result.push_back(std::move(p));
+			continue;
+		}
+		std::vector<MultiPolygon> sub;
+		sub.reserve(comp.size());
+		for (size_t idx : comp) sub.push_back(std::move(to_unify[idx]));
+
+		size_t step = 1, half_step;
+		do {
+			half_step = step; step *= 2;
+			for (size_t i = 0; i + half_step < sub.size(); i += step) {
+				MultiPolygon unified;
+				boost::geometry::union_(sub[i], sub[i + half_step], unified);
+				sub[i] = std::move(unified);
+			}
+		} while (step < sub.size());
+
+		for (auto &p : sub[0]) result.push_back(std::move(p));
+	}
+	to_unify[0] = std::move(result);
+}
+
+// ---------------
+// Sutherland-Hodgeman clipper
+// ported from Volodymyr Agafonkin's https://github.com/mapbox/lineclip
+
+// intersect a segment against one of the 4 lines that make up the bbox
+Point intersect_edge(Point const &a, Point const &b, char edge, Box const &bbox) {
+	if (edge & 8) return Point(a.x() + (b.x() - a.x()) * (bbox.max_corner().y() - a.y()) / (b.y() - a.y()), bbox.max_corner().y()); // top
+	if (edge & 4) return Point(a.x() + (b.x() - a.x()) * (bbox.min_corner().y() - a.y()) / (b.y() - a.y()), bbox.min_corner().y()); // bottom
+	if (edge & 2) return Point(bbox.max_corner().x(), a.y() + (b.y() - a.y()) * (bbox.max_corner().x() - a.x()) / (b.x() - a.x())); // right
+	if (edge & 1) return Point(bbox.min_corner().x(), a.y() + (b.y() - a.y()) * (bbox.min_corner().x() - a.x()) / (b.x() - a.x())); // left
+	throw std::runtime_error("intersect called on non-intersection");
+}
+
+// bit code reflects the point position relative to the bbox:
+//         left  mid  right
+//    top  1001  1000  1010
+//    mid  0001  0000  0010
+// bottom  0101  0100  0110
+
+char bit_code(Point const &p, Box const &bbox) {
+	char code = 0;
+	if      (p.x() < bbox.min_corner().x()) code |= 1; // left
+	else if (p.x() > bbox.max_corner().x()) code |= 2; // right
+	if      (p.y() < bbox.min_corner().y()) code |= 4; // bottom
+	else if (p.y() > bbox.max_corner().y()) code |= 8; // top
+	return code;
+}
+
+// Sutherland-Hodgeman polygon clipping algorithm
+void fast_clip(Ring &points, Box const &bbox, Ring &result) {
+	// clip against each side of the clip rectangle
+	for (char edge = 1; edge <= 8; edge *= 2) {
+		bool needsClip = false;
+		for (auto const &p: points) {
+			if (bit_code(p, bbox) & edge) {
+				needsClip = true;
+				break;
+			}
+		}
+		if (!needsClip) continue;
+
+		result.clear();
+		result.reserve(points.size() + 4);
+		Point prev = points[points.size() - 1];
+		bool prevInside = (bit_code(prev, bbox) & edge)==0;
+
+		for (unsigned int i = 0; i<points.size(); i++) {
+			Point p = points[i];
+			bool inside = (bit_code(p, bbox) & edge)==0;
+
+			// if segment goes through the clip window, add an intersection
+			if (inside!=prevInside) result.emplace_back(intersect_edge(prev, p, edge, bbox));
+			if (inside) result.emplace_back(p); // add a point if it's inside
+			prev = p;
+			prevInside = inside;
+		}
+		points.swap(result);
+		if (points.size()==0) break;
+	}
+}
+
+void fast_clip(Ring &points, Box const &bbox) {
+	Ring result;
+	fast_clip(points, bbox, result);
+}
+
+// Wrappers for polygon/multipolygon
+void fast_clip(Polygon &polygon, Box const &bbox) {
+	Ring result;
+	fast_clip(polygon.outer(), bbox, result);
+	if (polygon.outer().empty()) {
+		polygon.inners().resize(0);
+		return;
+	}
+	for (auto &inner: polygon.inners()) {
+		fast_clip(inner, bbox, result);
+	}
+	polygon.inners().erase(std::remove_if(
+		polygon.inners().begin(), polygon.inners().end(), 
+		[](const Ring &inner) -> bool { return inner.empty(); }),
+		polygon.inners().end());
+}
+
+void fast_clip(MultiPolygon &mp, Box const &bbox) {
+	for (auto &polygon: mp) {
+		fast_clip(polygon, bbox);
+	}
+	mp.erase(std::remove_if(
+		mp.begin(), mp.end(), 
+		[](const Polygon &poly) -> bool { return poly.outer().empty(); }),
+		mp.end());
+}

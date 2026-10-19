@@ -84,10 +84,10 @@
         // Initialize the native MapLibre GL Map
         const map = new maplibregl.Map({
             container: 'map',
-            style: 'https://demotiles.maplibre.org/style.json', // change to my local greybeard with source to assets/montreal.pmtiles once I have it 
+            style: 'assets/greybeard.json', // change to my local greybeard with source to assets/montreal.pmtiles once I have it 
             center: [-73.5773, 45.4959], // Concordia EV building [lng, lat]
-            zoom: 12,
-            pitch: 45,
+            zoom: 14,
+            pitch: 70,
             bearing: 0,
             antialias: true,
             attributionControl: false
@@ -110,12 +110,26 @@
                 type: 'circle',
                 source: 'bike-shops',
                 paint: {
-                    'circle-radius': 8,
+                    'circle-radius': 12,
                     'circle-color': '#ff5722',
                     'circle-stroke-width': 2,
                     'circle-stroke-color': '#ffffff'
                 }
             });
+
+            // 1. Create a container element for the marker
+            const el = document.createElement('div');
+            el.className = 'custom-marker';
+            el.style.backgroundImage = 'url("assets/rtm-marker.svg")';
+            el.style.width = '32px';   // Set your SVG width
+            el.style.height = '32px';  // Set your SVG height
+            el.style.backgroundSize = 'contain';
+            el.style.backgroundRepeat = 'no-repeat';
+            console.log(el);
+            // 2. Add the marker to the map
+            new maplibregl.Marker(el)
+                .setLngLat([-73.5673, 45.5017]) // [Longitude, Latitude] for Montreal
+                .addTo(map);
 
             // resize just to be sure and start auto rotation
             map.resize();
