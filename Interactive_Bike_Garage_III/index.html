@@ -77,63 +77,63 @@
 
 
     <script>
-
+        // start the PMTiles protocol
         const protocol = new pmtiles.Protocol();
         maplibregl.addProtocol("pmtiles", protocol.tile);
 
-        //Leaflet map centered over Montreal and disable controls
-        const map = L.map('map', {
-            zoomControl: false,
-            dragging: false,
-            scrollWheelZoom: false
-        }).setView([45.5017, -73.5673], 12);
+        // Initialize the native MapLibre GL Map
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://demotiles.maplibre.org/style.json', // change to my local greybeard with source to assets/montreal.pmtiles once I have it 
+            center: [-73.5773, 45.4959], // Concordia EV building [lng, lat]
+            zoom: 12,
+            pitch: 45,
+            bearing: 0,
+            antialias: true,
+            attributionControl: false
+        });
 
-        // prototyping with fixed image ---
-
-        // 2. Define geographic bounds to lock your export image over Montreal
-        // Adjust these coordinates if your image covers a specific neighborhood
-        // const imageBounds = [
-        //     [45.4800, -73.6200], // South-West corner
-        //     [45.5300, -73.5200]  // North-East corner
-        // ];
-
-        // 3. Add local exported JPEG image layer
-        // L.imageOverlay('assets/map-export.svg', imageBounds).addTo(map);
-
-        let maplibreLayer = null;
+        // variables for auto-rotation and can be later used to be controlled by IMU angle
         let rotationAngle = 0;
-
-        // Fetch local greybeard style JSON
-        fetch('assets/greybeard.json')
-            .then(res => res.json())
-            .then(style => {
-                L.maplibreGL({
-                    style: style
-                }).addTo(map);
-
-                // Re-evaluate container dimensions inside circle mask
-                setTimeout(() => { map.invalidateSize(); rotateMap() }, 200);
-            })
-            .catch(err => console.error("Error loading greybeard style:", err));
+        let isRotating = true;
 
 
-        //rotates the map slowly only if an instance of the map has already been created with script above
-        function rotateMap() {
-            if (maplibreLayer) {
+        map.on('load', () => {
 
-                const glMap = maplibreLayer.getMaplibreMap();
+            map.addSource('bike-shops', {
+                type: 'geojson',
+                data: 'js/shops.geojson'
+            });
 
-                if (glMap) {
-
-                    rotationAngle = (rotationAngle + 0.05) % 360; //slowly builds the angle and integers at 360deg for looping
-
-                    // Set the heading/bearing of the vector map without animation easing
-                    glMap.setBearing(rotationAngle, { animate: false });
+            map.addLayer({
+                id: 'bike-shops-layer',
+                type: 'circle',
+                source: 'bike-shops',
+                paint: {
+                    'circle-radius': 8,
+                    'circle-color': '#ff5722',
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#ffffff'
                 }
-            }
+            });
 
+            // resize just to be sure and start auto rotation
+            map.resize();
+            rotateMap();
+        });
+
+        //Smooth slow-rotation
+        function rotateMap() {
+            if (isRotating) {
+                rotationAngle = (rotationAngle + 0.05) % 360;
+                map.setBearing(rotationAngle);
+            }
             requestAnimationFrame(rotateMap);
         }
+
+        // ways to stop the auto rotation
+        map.on('mousedown', () => { isRotating = false; });
+        map.on('touchstart', () => { isRotating = false; });
     </script>
 
 </body>

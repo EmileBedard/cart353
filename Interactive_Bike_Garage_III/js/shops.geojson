@@ -1,0 +1,49 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.5795,
+                    45.4977
+                ]
+            },
+            "properties": {
+                "name": "Right to Move Concordia",
+                "is_coop": true
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.5788,
+                    45.4968
+                ]
+            },
+            "properties": {
+                "en_name": "Public Repair Stand",
+                "fr_name": "Station de réparation public",
+                "is_coop": true
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.5658,
+                    45.4888
+                ]
+            },
+            "properties": {
+                "en_name": "Mécanocycle Bike Shop",
+                "fr_name": "Atelier de vélo Mécanocycle",
+                "is_coop": false
+            }
+        }
+    ]
+}
