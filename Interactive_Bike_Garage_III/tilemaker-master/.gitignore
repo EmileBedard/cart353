@@ -1,0 +1,27 @@
+# object files created during the build and the output binary itself
+*.o
+*.d
+tilemaker
+tilemaker-server
+build/
+tilemaker.dSYM/
+
+# editor temporaries
+*~
+
+# python cache files
+__pycache__/
+*.pyc
+
+# vagrant local stuff
+.vagrant/
+
+# protocol buffers generated headers
+include/osmformat.pb.h
+include/vector_tile.pb.h
+src/config_schema.h
+
+# downloaded data
+coastline
+landcover
+/test.*

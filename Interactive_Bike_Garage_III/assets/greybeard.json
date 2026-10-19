@@ -1,10 +1,10 @@
 ﻿{
   "version": 8,
-  "name": "Greybeard Prototype",
+  "name": "Greybeard OpenMapTiles",
   "sources": {
     "protomaps": {
       "type": "vector",
-      "url": "pmtiles://../data/montreal.pmtiles"
+      "url": "pmtiles://assets/montreal.pmtiles"
     }
   },
   "layers": [
@@ -12,16 +12,27 @@
       "id": "background",
       "type": "background",
       "paint": {
-        "background-color": "#e0e0e0"
+        "background-color": "#8a959e"
       }
     },
     {
-      "id": "earth",
+      "id": "landuse",
       "type": "fill",
       "source": "protomaps",
-      "source-layer": "earth",
+      "source-layer": "landuse",
       "paint": {
-        "fill-color": "#dcdcdc"
+        "fill-color": "#e0e0e0",
+        "fill-opacity": 0.8
+      }
+    },
+    {
+      "id": "park",
+      "type": "fill",
+      "source": "protomaps",
+      "source-layer": "park",
+      "paint": {
+        "fill-color": "#d0d0d0",
+        "fill-opacity": 0.9
       }
     },
     {
@@ -30,26 +41,52 @@
       "source": "protomaps",
       "source-layer": "water",
       "paint": {
-        "fill-color": "#b5c4d0"
+        "fill-color": "#8a959e"
       }
     },
     {
-      "id": "roads",
+      "id": "waterway",
       "type": "line",
       "source": "protomaps",
-      "source-layer": "roads",
+      "source-layer": "waterway",
       "paint": {
-        "line-color": "#ffffff",
-        "line-width": 1.5
+        "line-color": "#8a959e",
+        "line-width": 1
       }
     },
     {
-      "id": "buildings",
+      "id": "building",
       "type": "fill",
       "source": "protomaps",
-      "source-layer": "buildings",
+      "source-layer": "building",
       "paint": {
-        "fill-color": "#cccccc"
+        "fill-color": "#cdcdcd",
+        "fill-opacity": 0.7
+      }
+    },
+    {
+      "id": "transportation",
+      "type": "line",
+      "source": "protomaps",
+      "source-layer": "transportation",
+      "paint": {
+        "line-color": "#ffffff",
+        "line-width": [
+          "interpolate",
+          [
+            "exponential",
+            1.6
+          ],
+          [
+            "zoom"
+          ],
+          8,
+          0.5,
+          12,
+          1.5,
+          16,
+          4
+        ]
       }
     }
   ]
