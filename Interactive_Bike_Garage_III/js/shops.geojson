@@ -11,22 +11,7 @@
                 ]
             },
             "properties": {
-                "name": "Right to Move Concordia",
-                "is_coop": true
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -73.5788,
-                    45.4968
-                ]
-            },
-            "properties": {
-                "en_name": "Public Repair Stand",
-                "fr_name": "Station de réparation public",
+                "en_name": "Right to Move Concordia",
                 "is_coop": true
             }
         },
