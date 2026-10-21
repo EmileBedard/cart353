@@ -77,6 +77,8 @@
 
 
     <script>
+        const lang = "english";
+
         // start the PMTiles protocol
         const protocol = new pmtiles.Protocol();
         maplibregl.addProtocol("pmtiles", protocol.tile);
@@ -100,36 +102,63 @@
 
         map.on('load', () => {
 
-            map.addSource('bike-shops', {
-                type: 'geojson',
-                data: 'js/shops.geojson'
-            });
+            fetch('js/shops.geojson')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Could not load shops.geojson: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(geojson => {
+                    map.addSource('bike-shops', {
+                        type: 'geojson',
+                        data: geojson
+                    });
 
-            map.addLayer({
-                id: 'bike-shops-layer',
-                type: 'circle',
-                source: 'bike-shops',
-                paint: {
-                    'circle-radius': 12,
-                    'circle-color': '#ff5722',
-                    'circle-stroke-width': 2,
-                    'circle-stroke-color': '#ffffff'
-                }
-            });
+                    map.addLayer({
+                        id: 'bike-shops-layer',
+                        type: 'circle',
+                        source: 'bike-shops',
+                        paint: {
+                            'circle-radius': 5,
+                            'circle-color': '#ff5722',
+                            'circle-stroke-width': 2,
+                            'circle-stroke-color': '#ffffff'
+                        }
+                    });
 
-            // 1. Create a container element for the marker
-            const el = document.createElement('div');
-            el.className = 'custom-marker';
-            el.style.backgroundImage = 'url("assets/rtm-marker.svg")';
-            el.style.width = '32px';   // Set your SVG width
-            el.style.height = '32px';  // Set your SVG height
-            el.style.backgroundSize = 'contain';
-            el.style.backgroundRepeat = 'no-repeat';
-            console.log(el);
-            // 2. Add the marker to the map
-            new maplibregl.Marker(el)
-                .setLngLat([-73.5673, 45.5017]) // [Longitude, Latitude] for Montreal
-                .addTo(map);
+                    geojson.features.forEach(feature => {
+                        if (feature.geometry?.type !== 'Point') return;
+
+                        const properties = feature.properties || {};
+
+                        let name = "";
+                        if (lang !== "english") {
+                            name = properties.fr_name;
+                        }
+                        else {
+                            name = properties.en_name;
+                        }
+
+                        const content = document.createElement('div');
+                        const title = document.createElement('strong');
+
+                        title.textContent = name;
+                        content.appendChild(title);
+
+
+
+                        new maplibregl.Popup({
+                            closeButton: false,
+                            closeOnClick: false,
+                            className: 'shop-popup'
+                        })
+                            .setLngLat(feature.geometry.coordinates)
+                            .setDOMContent(content)
+                            .addTo(map);
+                    });
+                })
+                .catch(error => console.error('Failed to load bike shop data:', error));
 
             // resize just to be sure and start auto rotation
             map.resize();
