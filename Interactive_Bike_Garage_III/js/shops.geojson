@@ -12,6 +12,7 @@
             },
             "properties": {
                 "en_name": "Right to Move Concordia",
+                "fr_name": "La Voie Libre Concordia",
                 "is_coop": true
             }
         },
@@ -27,6 +28,96 @@
             "properties": {
                 "en_name": "Mécanocycle Bike Shop",
                 "fr_name": "Atelier de vélo Mécanocycle",
+                "is_coop": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.56996609725213,
+                    45.509677881227034
+                ]
+            },
+            "properties": {
+                "en_name": "BQAM-E",
+                "fr_name": "BQAM-E",
+                "is_coop": true
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.58045788770103,
+                    45.48521972299069
+                ]
+            },
+            "properties": {
+                "en_name": "Cycle Technique bike shop",
+                "fr_name": "Magasin de vélo Cycle Technique",
+                "is_coop": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.55749493177095,
+                    45.49478260562584
+                ]
+            },
+            "properties": {
+                "en_name": "Allo Velo bike shop",
+                "fr_name": "Atelier de vélo Allo Velo",
+                "is_coop": false
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.56257215861042,
+                    45.493481571734954
+                ]
+            },
+            "properties": {
+                "en_name": "ETS bike shop C.R.A.B.E.",
+                "fr_name": "C.R.A.B.E. Atelier de vélo de l'ETS",
+                "is_coop": true
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.57813600024954,
+                    45.50356008354019
+                ]
+            },
+            "properties": {
+                "en_name": "McGill FlatBike Collective",
+                "fr_name": "FlatBike, coop étudiante de McGill",
+                "is_coop": true
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.61242022505361,
+                    45.523106027619356
+                ]
+            },
+            "properties": {
+                "en_name": "Cycle Régis Bike Shop",
+                "fr_name": "Atelier de vélo Cycle Régis",
                 "is_coop": false
             }
         }
