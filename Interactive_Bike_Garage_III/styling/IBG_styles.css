@@ -1,6 +1,13 @@
+/* Custom Seven Points font */
+@font-face {
+    font-family: 'Seven Points';
+    src: url('assets/SevenPoints.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 /* Space Mono styling from google font website */
-
-
 .space-mono-regular {
     font-family: "Space Mono", monospace;
     font-weight: 400;
@@ -25,20 +32,56 @@
     font-style: italic;
 }
 
-/* styling for circular leaflet map map */
+
+.main-zone {
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, min(650px, 52vw)) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(8px, 2vw, 24px);
+    padding: 8px;
+}
+
+#bike-id-button,
+#maintenance-button {
+    width: 450px;
+    aspect-ratio: 1;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
+    justify-self: center;
+    border: 5px solid white;
+    border-radius: 50%;
+    background: transparent;
+    color: white;
+    text-align: center;
+    font-family: "Seven Points", monospace;
+    font-size: 3em;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    z-index: 4;
+}
+
+#bike-id-button p,
+#maintenance-button p {
+    align-items: center;
+}
+
+
 /* Circular Map Widget Container */
 #map-circle-container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 350px;
-    height: 350px;
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 650px;
+    height: 450px;
     border-radius: 50%;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6);
     border: 3px solid black;
-    z-index: 10;
+    z-index: 3;
 
 }
 
@@ -59,15 +102,27 @@
 /* styling for the map's popups */
 
 .shop-popup .maplibregl-popup-content {
+    background: #fff;
+    color: #000;
+    border-radius: 20px 20px;
+    font-family: "Space Mono", monospace;
+    font-style: bold;
+}
+
+.shop-popup .maplibregl-popup-tip {
+    border-top-color: #fff;
+}
+
+.coop-popup .maplibregl-popup-content {
     background: #000;
     color: #fff;
     border-radius: 20px 20px;
     font-family: "Space Mono", monospace;
+    font-style: bold;
 }
 
-.shop-popup .maplibregl-popup-tip {
+.coop-popup .maplibregl-popup-tip {
     border-top-color: #000;
-    border-bottom-color: #000;
 }
 
 
@@ -131,15 +186,6 @@ h3 {
     color: white;
 }
 
-.main-zone {
-    height: 80vh;
-    display: grid;
-    justify-content: center;
-    align-items: center;
-    grid-template-columns: 1fr 1fr;
-
-}
-
 
 #canvas-container {
     position: fixed;
@@ -150,7 +196,7 @@ h3 {
     margin: 0 auto;
     overflow: hidden;
 
-    z-index: -5;
+    z-index: 0;
 
 }
 

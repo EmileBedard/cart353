@@ -1,12 +1,14 @@
 // THREE.JS imports ----
 import * as THREE from "three";
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 
-// setup ---- 
+// setup ----
+
 
 //// gltf loader ----
 const gltfLoader = new GLTFLoader();
@@ -41,7 +43,7 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Good for sharp text/edges
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = false; //-------------------SHADOWS DISABLED FOR NOW
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 //// effects composer ----
@@ -63,6 +65,17 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
+// prototyping orbit controls
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.update();
+
+// lighting
+
+const keyLight = new THREE.DirectionalLight(0xffffff, 2);
+keyLight.position.set(0, 15, 3); // XYZ X:left to right Y: bottom to up Z: background to foreground
+keyLight.castShadow = true;
+scene.add(keyLight);
 
 
 // Main Scene ----
@@ -98,6 +111,10 @@ function addAndRun(loadedObjsArray) {
     const workbenchScene = loadedObjsArray[0];
 
     if (workbenchScene) {
+        let workbenchMesh = workbenchScene.children.find(child => child.isMesh);
+        workbenchMesh.castShadow = true;
+        workbenchMesh.receiveShadow = true;
+
         scene.add(workbenchScene);
     }
 
@@ -105,6 +122,8 @@ function addAndRun(loadedObjsArray) {
     let blenderCamera = workbenchScene.children.find(child => child.isCamera);
 
     //change between initial and blender cam here
+    //prototyping camera enter: camera
+    //scene camera enter: blenderCamera
     let usedCam = blenderCamera;
     if (usedCam === blenderCamera) {
         blenderCamera.name = "blenderCamera";
@@ -125,7 +144,7 @@ function addAndRun(loadedObjsArray) {
         renderPass.camera = camera;
     }
     else {
-        console.log("camera not loaded:error")
+        console.log("camera not loaded: switching to orbit controlled prototyping camera")
     }
 
 
@@ -138,10 +157,9 @@ function addAndRun(loadedObjsArray) {
         //calculate the difference since last frame
         let deltaTime = (timer - elapsedTime) / 1000; //put in secs
         elapsedTime = timer; //update  new elapsedTime
-
+        controls.update();
         composer.render();
         window.requestAnimationFrame(animate);
     }
 }
-
 

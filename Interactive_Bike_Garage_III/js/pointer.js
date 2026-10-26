@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         left: '50%',
         width: '10px',               // Set cursor size
         height: '10px',
-        backgroundColor: 'red',  // Custom visual indicator
+        backgroundColor: 'black',  // Custom visual indicator
         borderRadius: '50%',
         pointerEvents: 'none',       // Crucial: lets clicks pass through to the Three.js canvas
         zIndex: '15',              // Ensures it stays on top of all canvas layers
