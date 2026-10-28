@@ -1,52 +1,53 @@
 let currentTargetElement = null;
 let hoverTimer = null;
-const hoverDuration = 5000; // 5 seconds
+const hoverDuration = 2000; //in milliseconds
 
-// Execute once the DOM is ready, create a pointer
+// start is used for animations
+let start = undefined;
+
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. Create the container div
     const customCursor = document.createElement("div");
     customCursor.id = "custom-cursor";
-
-    // 2. Style the custom cursor element directly
-    Object.assign(customCursor.style, {
-        position: 'fixed',
-        top: '50%',                  // Center vertically (or set to your preferred fixed Y position)
-        left: '50%',
-        width: '10px',               // Set cursor size
-        height: '10px',
-        backgroundColor: 'black',  // Custom visual indicator
-        borderRadius: '50%',
-        pointerEvents: 'none',       // Crucial: lets clicks pass through to the Three.js canvas
-        zIndex: '15',              // Ensures it stays on top of all canvas layers
-        transform: 'translate(-50%, -50%)', // Centers the dot on the X position
-        transition: 'transform 0.05s ease-out'
-    });
-
-    // 3. Append to the document body dynamically
     document.body.appendChild(customCursor);
+    updateCursorPosition(600);
+
 });
+
+//PROTOTYPING calls updateCursorPosition(xPos) with browsers mouseX position. will be commented when the IMU is implemented
+document.addEventListener('mousemove', function (event) {
+    let mouseX = event.clientX;
+    updateCursorPosition(mouseX);
+});
+
 
 // here this functions needs to be called by the data updates from the imu passing from the websocket. the xPos parameter here will be the data from the imu used to control the pointer.
 function updateCursorPosition(xPos) {
 
-    const minX = 50; //minimum range for cursor
-    const maxX = window.innerWidth - 50; //maximum range for cursor
+    const customCursor = document.getElementById("custom-cursor");
+
+    const minX = 50;
+    const maxX = window.innerWidth - 50;
+    //clampedX outputs the position of the cursor limited to minX and maxX. Math.min outputs the min from the sequence and Math.max does similarly with maximum value
     const clampedX = Math.max(minX, Math.min(maxX, xPos));
 
 
-    const fixedY = window.innerHeight / 2; //fixed along y axis
+    const fixedY = window.innerHeight / 2;
     customCursor.style.left = `${clampedX}px`;
     customCursor.style.top = `${fixedY}px`;
 
-    // 3. Find the element beneath the cursor's current (X, Y) coordinates
+    // returns the element underneath
+    let currentElement = null;
     const elementAtPoint = document.elementFromPoint(clampedX, fixedY);
 
-    // Check if the element (or its parent) is an interactive HTML button/link
-    const interactiveElement = elementAtPoint?.closest('button, a, .clickable');
+    if (currentElement !== elementAtPoint) {
+        currentElement = elementAtPoint;
+        const interactiveElement = currentElement?.closest('button, a, .clickable');
+        handleHoverLogic(interactiveElement);
+        console.log(currentElement);
 
-    handleHoverLogic(interactiveElement);
+    }
+
 }
 
 function handleHoverLogic(newTarget) {
@@ -55,18 +56,49 @@ function handleHoverLogic(newTarget) {
         resetHoverTimer();
         currentTargetElement = newTarget;
 
-        // Case 2: Cursor entered a new clickable element -> start 10s timer
         if (currentTargetElement) {
-            console.log("Hover started on element:", currentTargetElement);
+            console.log("Hover started", currentTargetElement);
 
-            // Optional: Add visual feedback (e.g., CSS loading ring or color change)
+            start = undefined;
             currentTargetElement.classList.add('hover-active');
+            requestAnimationFrame(timestamp => animateProgress(currentTargetElement, timestamp));
 
             hoverTimer = setTimeout(() => {
                 triggerDwellClick(currentTargetElement);
+
             }, hoverDuration);
         }
+
     }
+
+}
+
+//used to animate the selectable shapes
+function animateProgress(target, timestamp) {
+    const button = target;
+    console.log(target);
+
+    if (start === undefined) {
+        start = timestamp;
+    }
+    const elapsed = timestamp - start;
+
+    const arc = Math.min((0.04 * elapsed) + 120, 240);
+    button.style.backgroundImage = `conic-gradient(at 50% -100%, #ffffff70 0deg, #ffffff70 ${arc}deg, transparent ${arc + 20}deg, transparent 240deg)`;
+
+    if (arc < 240) {
+        requestAnimationFrame(timestamp => animateProgress(target, timestamp));
+    }
+}
+
+
+function triggerDwellClick(element) {
+
+    element.click();
+
+    resetHoverTimer();
+    currentTargetElement = null;
+    start = undefined;
 }
 
 function resetHoverTimer() {
@@ -77,14 +109,4 @@ function resetHoverTimer() {
     if (currentTargetElement) {
         currentTargetElement.classList.remove('hover-active');
     }
-}
-
-function triggerDwellClick(element) {
-
-    // Dispatch standard click event
-    element.click();
-
-    // Reset target state after activation
-    resetHoverTimer();
-    currentTargetElement = null;
 }

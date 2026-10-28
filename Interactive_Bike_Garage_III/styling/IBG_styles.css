@@ -32,7 +32,7 @@
     font-style: italic;
 }
 
-
+/* Main zone for index.html. 2 buttons and map in the center */
 .main-zone {
     min-height: 100vh;
     box-sizing: border-box;
@@ -42,6 +42,8 @@
     gap: clamp(8px, 2vw, 24px);
     padding: 8px;
 }
+
+/* styling for the two buttons and the smooth animations associated */
 
 #bike-id-button,
 #maintenance-button {
@@ -61,11 +63,43 @@
     letter-spacing: 0.1em;
     cursor: pointer;
     z-index: 4;
+    transition: 0.4s ease;
+
+}
+
+#bike-id-button:hover,
+#maintenance-button:hover {
+    width: 550px;
+    letter-spacing: 0.2em;
+    border: 8px solid white;
+}
+
+#bike-id-button.hover-active,
+#maintenance-button.hover-active {
+    width: 550px;
+    letter-spacing: 0.2em;
+    border: 8px solid hsl(0, 0%, 100%);
+    background-image: conic-gradient(at 50% -100%, red 120deg, red 140deg, transparent 130deg, transparent 240deg)
 }
 
 #bike-id-button p,
 #maintenance-button p {
     align-items: center;
+}
+
+/* styling for the pointer that emulates the mouse */
+
+#custom-cursor {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    background-color: black;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 15;
+    transform: translate(-50%, -50%);
 }
 
 
