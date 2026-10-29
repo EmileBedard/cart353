@@ -47,45 +47,53 @@
 
 #bike-id-button,
 #maintenance-button {
-    width: 450px;
+    width: 600px;
     aspect-ratio: 1;
     box-sizing: border-box;
     display: grid;
     place-items: center;
     justify-self: center;
-    border: 5px solid white;
-    border-radius: 50%;
-    background: transparent;
     color: white;
     text-align: center;
-    font-family: "Seven Points", monospace;
-    font-size: 3em;
-    letter-spacing: 0.1em;
-    cursor: pointer;
     z-index: 4;
-    transition: 0.4s ease;
-
 }
 
-#bike-id-button:hover,
-#maintenance-button:hover {
-    width: 550px;
-    letter-spacing: 0.2em;
-    border: 8px solid white;
-}
-
-#bike-id-button.hover-active,
-#maintenance-button.hover-active {
-    width: 550px;
-    letter-spacing: 0.2em;
-    border: 8px solid hsl(0, 0%, 100%);
-    background-image: conic-gradient(at 50% -100%, red 120deg, red 140deg, transparent 130deg, transparent 240deg)
-}
 
 #bike-id-button p,
 #maintenance-button p {
-    align-items: center;
+    font-family: "Seven Points", monospace;
+    font-size: 3em;
+    letter-spacing: 0.1em;
+    position: absolute;
+    pointer-events: none;
 }
+
+#bike-id-button svg,
+#maintenance-button svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.svg-circle {
+    cx: 50%;
+    cy: 50%;
+    r: 220px;
+    stroke: white;
+    stroke-width: 5;
+    fill: transparent;
+    z-index: 5;
+    stroke-dashArray: 100 100;
+    transition: 0.4s ease;
+    cursor: pointer;
+}
+
+.svg-circle.hover-active {
+    r: 280px;
+    letter-spacing: 0.2em;
+    stroke-width: 10;
+}
+
 
 /* styling for the pointer that emulates the mouse */
 
