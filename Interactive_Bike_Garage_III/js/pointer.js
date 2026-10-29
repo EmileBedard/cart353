@@ -42,7 +42,7 @@ function updateCursorPosition(xPos) {
 
     if (currentElement !== elementAtPoint) {
         currentElement = elementAtPoint;
-        const interactiveElement = currentElement?.closest('button, a, .clickable');
+        const interactiveElement = currentElement?.closest('button, a, .clickable, circle');
         handleHoverLogic(interactiveElement);
         console.log(currentElement);
 
@@ -75,19 +75,19 @@ function handleHoverLogic(newTarget) {
 
 //used to animate the selectable shapes
 function animateProgress(target, timestamp) {
-    const button = target;
-    console.log(target);
+    if (target === circle) {
+        console.log("is_circle")
+        if (start === undefined) {
+            start = timestamp;
+        }
+        const elapsed = timestamp - start;
 
-    if (start === undefined) {
-        start = timestamp;
-    }
-    const elapsed = timestamp - start;
+        const arc = Math.min((0.04 * elapsed), 100);
+        button.style.backgroundImage = `conic-gradient(at 50% -100%, #ffffff70 0deg, #ffffff70 ${arc}deg, transparent ${arc + 20}deg, transparent 240deg)`;
 
-    const arc = Math.min((0.04 * elapsed) + 120, 240);
-    button.style.backgroundImage = `conic-gradient(at 50% -100%, #ffffff70 0deg, #ffffff70 ${arc}deg, transparent ${arc + 20}deg, transparent 240deg)`;
-
-    if (arc < 240) {
-        requestAnimationFrame(timestamp => animateProgress(target, timestamp));
+        if (arc < 240) {
+            requestAnimationFrame(timestamp => animateProgress(target, timestamp));
+        }
     }
 }
 
