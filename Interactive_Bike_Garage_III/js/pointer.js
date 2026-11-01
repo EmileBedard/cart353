@@ -1,9 +1,10 @@
 let currentTargetElement = null;
 let hoverTimer = null;
-const hoverDuration = 2000; //in milliseconds
+let animationFrameId = null;
+const hoverDuration = 2300; //in milliseconds
 
 // start is used for animations
-let start = undefined;
+let start = null;
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -44,69 +45,85 @@ function updateCursorPosition(xPos) {
         currentElement = elementAtPoint;
         const interactiveElement = currentElement?.closest('button, a, .clickable, circle');
         handleHoverLogic(interactiveElement);
-        console.log(currentElement);
 
     }
 
 }
 
 function handleHoverLogic(newTarget) {
-    // Case 1: Cursor moved away from the target element -> reset timer
+    const textElement = document.getElementById
+
     if (newTarget !== currentTargetElement) {
         resetHoverTimer();
         currentTargetElement = newTarget;
 
-        if (currentTargetElement) {
-            console.log("Hover started", currentTargetElement);
+        if (!currentTargetElement) return;
 
-            start = undefined;
-            currentTargetElement.classList.add('hover-active');
-            requestAnimationFrame(timestamp => animateProgress(currentTargetElement, timestamp));
+        currentTargetElement.classList.add('hover-active');
+        currentTargetElement.style.strokeDasharray = '0 100';
 
-            hoverTimer = setTimeout(() => {
-                triggerDwellClick(currentTargetElement);
-
-            }, hoverDuration);
+        if (currentTargetElement.parentElement.parentElement.firstElementChild.nodeName === "P") {
+            const pText = currentTargetElement.parentElement.parentElement.firstElementChild
+            pText.classList.add('hover-active');
         }
 
+        animationFrameId = requestAnimationFrame(timestamp => animateProgress(currentTargetElement, timestamp));
+        hoverTimer = setTimeout(() => {
+            triggerDwellClick(currentTargetElement);
+
+        }, hoverDuration);
     }
 
 }
 
+
+
 //used to animate the selectable shapes
 function animateProgress(target, timestamp) {
-    if (target === circle) {
-        console.log("is_circle")
-        if (start === undefined) {
-            start = timestamp;
-        }
-        const elapsed = timestamp - start;
+    if (target !== currentTargetElement) return;
 
-        const arc = Math.min((0.04 * elapsed), 100);
-        button.style.backgroundImage = `conic-gradient(at 50% -100%, #ffffff70 0deg, #ffffff70 ${arc}deg, transparent ${arc + 20}deg, transparent 240deg)`;
+    if (start === null) {
+        start = timestamp;
+    }
 
-        if (arc < 240) {
-            requestAnimationFrame(timestamp => animateProgress(target, timestamp));
-        }
+    const elapsed = timestamp - start;
+    const progress = Math.min(100 * elapsed / hoverDuration, 100);
+    target.style.strokeDasharray = `${progress} 100`;
+
+    if (progress < 100) {
+        animationFrameId = requestAnimationFrame(nextTimestamp =>
+            animateProgress(target, nextTimestamp)
+        );
+    } else {
+        animationFrameId = null;
     }
 }
 
 
 function triggerDwellClick(element) {
-
-    element.click();
+    if (element !== currentTargetElement) return;
 
     resetHoverTimer();
     currentTargetElement = null;
-    start = undefined;
+    element.click();
 }
 
 function resetHoverTimer() {
-    if (hoverTimer) {
+    if (hoverTimer !== null) {
         clearTimeout(hoverTimer);
         hoverTimer = null;
     }
-    if (currentTargetElement) {
-        currentTargetElement.classList.remove('hover-active');
+
+    if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
     }
+
+    if (currentTargetElement) {
+        currentTargetElement.style.strokeDasharray = '100 100';
+        currentTargetElement.classList.remove('hover-active');
+        currentTargetElement.closest('a')?.querySelector('p')?.classList.remove('hover-active');
+    }
+
+    start = null;
 }
