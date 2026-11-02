@@ -13,13 +13,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(customCursor);
     updateCursorPosition(600);
 
+    //PROTOTYPING calls updateCursorPosition(xPos) with browsers mouseX position. will be commented when the IMU is implemented
+    document.addEventListener('mousemove', function (event) {
+        let mouseX = event.clientX;
+        updateCursorPosition(mouseX);
+    });
+
 });
 
-//PROTOTYPING calls updateCursorPosition(xPos) with browsers mouseX position. will be commented when the IMU is implemented
-document.addEventListener('mousemove', function (event) {
-    let mouseX = event.clientX;
-    updateCursorPosition(mouseX);
-});
+
 
 
 // here this functions needs to be called by the data updates from the imu passing from the websocket. the xPos parameter here will be the data from the imu used to control the pointer.
@@ -105,7 +107,7 @@ function triggerDwellClick(element) {
 
     resetHoverTimer();
     currentTargetElement = null;
-    element.click();
+    element.closest("a").click();
 }
 
 function resetHoverTimer() {
