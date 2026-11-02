@@ -137,7 +137,8 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -2;
+    z-index: 0;
+    /* needs to be positive for it to be controllable by the prototyping 3d perspective camera in three.js */
 }
 
 /* styling for the map's popups */
@@ -180,8 +181,15 @@ body {
 }
 
 a {
+    position: relative;
     text-decoration: none;
     color: inherit;
+    z-index: 2;
+}
+
+a button {
+    width: 90px;
+    height: 20px;
 }
 
 
@@ -190,8 +198,6 @@ a {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    z-index: 3;
 }
 
 /* Styling for Bike Id questions and slider inputs */
