@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => { //only initialize after DO
         // Cycle7 [-73.55233013686879, 45.481121101454804]
 
         zoom: 14,
-        pitch: 45,
+        pitch: 50,
         bearing: 0,
         antialias: true,
         attributionControl: false

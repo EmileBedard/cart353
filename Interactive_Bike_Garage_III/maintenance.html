@@ -6,35 +6,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Interactive Bike Garage">
 
-
     <meta property="og:title" content="Interactive Bike Garage">
     <meta property="og:description" content="Interactive Bike Garage">
 
-
     <meta name="author" content="Emile Bedard">
-    <meta name="copyright" content="copyright Emile Bedard, project 2 CART 263, 2025">
+    <meta name="copyright" content="copyright Emile Bedard, CART 353, 2026">
 
-    <title>Interactive Bike Garage II</title>
-    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <title>Interactive Bike Garage III</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 
-
-
+    <!-- CSS Stylesheets-->
     <link rel="stylesheet" href="styling/IBG_styles.css">
-    <link rel="stylesheet" href="styling/IBG_styles_parts_registry.css">
     <link rel="stylesheet" href="styling/IBG_mobile.css">
 
+    <!-- local seven points font-->
+    <link rel="preload" href="assets/SevenPoints.woff2" as="font" type="font/woff2" crossorigin>
 
-    <!-- Space mono font from google-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-        rel="stylesheet">
+    <!-- local space mono font-->
+    <link rel="preload" href="assets/SpaceMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/SpaceMono-Bold.woff2" as="font" type="font/woff2" crossorigin>
 
-    <script src="js/bike.js" defer></script>
-    <script src="js/createBikes.js" defer></script>
-    <script src="js/registerBikeParts.js" defer></script>
+    <!-- TWEEN animation library-->
+    <script src="js/tweenjs.js"></script>
 
+    <!--THREE JS-->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.182.0/examples/jsm/"
+      }
+    }
+    </script>
+
+    <!-- Three.js 3D scene-->
+    <script type="module" src="js/InteractiveBikeGarage3-ThreeJS.js"></script>
+
+    <!-- Node Terminal line for browser synced prototyping 
+     npx browser-sync start --server --files "**/*.html, **/*.css, **/*.js"
+    -->
 </head>
 
 <body>

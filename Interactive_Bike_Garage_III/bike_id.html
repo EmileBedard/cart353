@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive Bike Garage">
+
+    <meta property="og:title" content="Interactive Bike Garage">
+    <meta property="og:description" content="Interactive Bike Garage">
+
+    <meta name="author" content="Emile Bedard">
+    <meta name="copyright" content="copyright Emile Bedard, CART 353, 2026">
+
+    <title>Interactive Bike Garage III</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+
+    <!-- CSS Stylesheets-->
+    <link rel="stylesheet" href="styling/IBG_styles.css">
+    <link rel="stylesheet" href="styling/IBG_mobile.css">
+
+    <!-- local seven points font-->
+    <link rel="preload" href="assets/SevenPoints.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- local space mono font-->
+    <link rel="preload" href="assets/SpaceMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/SpaceMono-Bold.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- TWEEN animation library-->
+    <script src="js/tweenjs.js"></script>
+
+    <!--THREE JS-->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.182.0/examples/jsm/"
+      }
+    }
+    </script>
+
+    <!-- Three.js 3D scene-->
+    <script type="module" src="js/InteractiveBikeGarage3-ThreeJS.js"></script>
+
+    <!-- Node Terminal line for browser synced prototyping 
+     npx browser-sync start --server --files "**/*.html, **/*.css, **/*.js"
+    -->
+</head>
+
+<body>
+
+    <!-- PROTOTYPING: Index button to go back to main page-->
+    <div class="banner-buttons">
+        <a href="index.html">
+            <button id="registerPartsButton">index</button>
+        </a>
+    </div>
+
+    <div id="canvas-container">
+        <!-- canvas for three.js-->
+        <canvas id="three-ex"></canvas>
+    </div>
+
+    <!-- Bike id questions based on order-->
+
+    <h2>Register Bike ID</h2>
+
+    <div class="question">
+        <p>Choose a name for your bicycle</p>
+        <div class="slidecontainer">
+            <div class="progressBar"></div>
+            <input type="range" min="1" max="100" value="1" class="slider" id="myRange">
+            <div class="value">
+                <p>value</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="question" hidden>
+        <p>How many speeds does your bicycle have?</p>
+        <div class="slidecontainer">
+            <div class="progressBar"></div>
+            <input type="range" min="1" max="11" value="1" class="slider" id="myRange">
+        </div>
+    </div>
+
+    <div class="question" hidden>
+        <p>What is your groupset brand?</p>
+        <div class="slidecontainer">
+            <div class="progressBar"></div>
+            <input type="range" min="1" max="3" value="1" class="slider" id="myRange">
+            <!-- Only 3 options here for SRAM SHIMANO and CAMPAGNOLO-->
+        </div>
+    </div>
+
+</html>
