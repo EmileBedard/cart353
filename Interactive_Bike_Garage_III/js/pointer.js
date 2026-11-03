@@ -107,7 +107,15 @@ function triggerDwellClick(element) {
 
     resetHoverTimer();
     currentTargetElement = null;
-    element.closest("a").click();
+    const link = element.closest("a");
+
+    window.dispatchEvent(new CustomEvent("three-camera-move", {
+        detail: {
+            position: [0, 5, 10], // Replace with the destination camera position
+            // onComplete: () => link?.click()
+        }
+    }));
+
 }
 
 function resetHoverTimer() {

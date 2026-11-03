@@ -34,6 +34,7 @@ let canvas = document.querySelector("canvas#three-ex");
 //// camera (before attaching to blenderCamera)----
 let camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000);
 camera.position.set(0, 5, 10);
+camera.rotation.set(0, 0, 0);
 scene.add(camera);
 
 //// renderer ----
@@ -129,11 +130,11 @@ function addAndRun(loadedObjsArray) {
         blenderCamera.name = "blenderCamera";
         camera = blenderCamera;
 
-        const isRegistryPage = window.location.pathname.includes('parts_registry.html');
-        if (isRegistryPage) {
-            const registryPos = new THREE.Vector3(-17, 15, 40);
-            camera.position.copy(registryPos);
-            originalBlenderPos.copy(registryPos);
+        const isIDpage = window.location.pathname.includes('bike_id.html');
+        if (isIDpage) {
+            const IDPos = new THREE.Vector3(-24, 1.1, 9);
+            camera.position.copy(IDPos);
+            originalBlenderPos.copy(IDPos);
         } else {
             originalBlenderPos.copy(blenderCamera.position);
         }
@@ -146,6 +147,32 @@ function addAndRun(loadedObjsArray) {
     else {
         console.log("camera not loaded: switching to orbit controlled prototyping camera")
     }
+
+
+    //camera animation triggered by triggerdwellclick function in pointer.js
+    window.addEventListener("three-camera-move", ({ detail }) => {
+        const start = camera.position.clone();
+        const end = new THREE.Vector3(...detail.position);
+        const startTime = performance.now();
+        const duration = 1000;
+
+        function animateCamera(now) {
+            const t = Math.min((now - startTime) / duration, 1);
+            const eased = t * t * (3 - 2 * t);
+
+            camera.position.lerpVectors(start, end, eased);
+
+            if (t < 1) {
+                requestAnimationFrame(animateCamera);
+            } else {
+                detail.onComplete?.();
+            }
+        }
+
+        requestAnimationFrame(animateCamera);
+    });
+
+
 
 
 
