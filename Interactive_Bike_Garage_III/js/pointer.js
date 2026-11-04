@@ -104,17 +104,28 @@ function animateProgress(target, timestamp) {
 
 function triggerDwellClick(element) {
     if (element !== currentTargetElement) return;
-
+    console.log(element)
     resetHoverTimer();
+    hideElements(element);
     currentTargetElement = null;
     const link = element.closest("a");
 
-    window.dispatchEvent(new CustomEvent("three-camera-move", {
-        detail: {
-            position: [0, 5, 10], // Replace with the destination camera position
-            // onComplete: () => link?.click()
-        }
-    }));
+    if (element.closest("#bike-id-button")) {
+        window.dispatchEvent(new CustomEvent("three-camera-move", {
+            detail: {
+                position: [-24, 1.1, 9], // Replace with the destination camera position
+                onComplete: () => link?.click()
+            }
+        }));
+    }
+    if (element.closest("#maintenance-button")) {
+        window.dispatchEvent(new CustomEvent("three-camera-move", {
+            detail: {
+                position: [28, 1.1, 8], // Replace with the destination camera position
+                onComplete: () => link?.click()
+            }
+        }));
+    }
 
 }
 
@@ -136,4 +147,8 @@ function resetHoverTimer() {
     }
 
     start = null;
+}
+
+function hideElements() {
+    document.querySelector(".main-zone").style.display = "none";
 }
