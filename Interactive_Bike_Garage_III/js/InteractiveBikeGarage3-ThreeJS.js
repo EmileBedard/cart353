@@ -130,11 +130,21 @@ function addAndRun(loadedObjsArray) {
         blenderCamera.name = "blenderCamera";
         camera = blenderCamera;
 
+        //these trigger quick page navigation for prototyping
         const isIDpage = window.location.pathname.includes('bike_id.html');
         if (isIDpage) {
             const IDPos = new THREE.Vector3(-24, 1.1, 9);
             camera.position.copy(IDPos);
             originalBlenderPos.copy(IDPos);
+        } else {
+            originalBlenderPos.copy(blenderCamera.position);
+        }
+
+        const isMaintenancepage = window.location.pathname.includes('maintenance.html');
+        if (isMaintenancepage) {
+            const maintenancePos = new THREE.Vector3(28, 1.1, 8);
+            camera.position.copy(maintenancePos);
+            originalBlenderPos.copy(maintenancePos);
         } else {
             originalBlenderPos.copy(blenderCamera.position);
         }
@@ -154,7 +164,7 @@ function addAndRun(loadedObjsArray) {
         const start = camera.position.clone();
         const end = new THREE.Vector3(...detail.position);
         const startTime = performance.now();
-        const duration = 1000;
+        const duration = 5000;
 
         function animateCamera(now) {
             const t = Math.min((now - startTime) / duration, 1);
