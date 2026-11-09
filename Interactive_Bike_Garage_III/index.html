@@ -31,6 +31,8 @@
     <script src="assets/maplibre-gl.js"></script>
     <script src="assets/leaflet-maplibre-gl.js"></script>
     <script src="assets/pmtiles.js"></script>
+
+    <!-- My js scripts-->
     <script src="js/pointer.js"></script>
     <script src="js/map.js"></script>
 
@@ -58,10 +60,13 @@
 
 <body>
 
+    <div class="spotLight"></div>
+
     <!-- Background Three.js Canvas -->
     <div id="canvas-container">
         <canvas id="three-ex" style="width: 100%; height: 100%;"></canvas>
     </div>
+
 
     <div class="main-zone">
 
@@ -71,6 +76,10 @@
                 <circle class="svg-circle" pathLength="100" />
             </svg>
         </a>
+
+        <div class="map-title">
+            <p>BIKE SHOPS NEAR YOU</p>
+        </div>
 
         <!-- Circular Montreal Map Overlay -->
         <div id="map-circle-container">

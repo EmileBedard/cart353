@@ -27,17 +27,23 @@ document.addEventListener('DOMContentLoaded', () => {
 // here this functions needs to be called by the data updates from the imu passing from the websocket. the xPos parameter here will be the data from the imu used to control the pointer.
 function updateCursorPosition(xPos) {
 
-    const customCursor = document.getElementById("custom-cursor");
-
-    const minX = 50;
-    const maxX = window.innerWidth - 50;
+    const minX = 500;
+    const maxX = window.innerWidth - 500;
     //clampedX outputs the position of the cursor limited to minX and maxX. Math.min outputs the min from the sequence and Math.max does similarly with maximum value
     const clampedX = Math.max(minX, Math.min(maxX, xPos));
-
-
     const fixedY = window.innerHeight / 2;
-    customCursor.style.left = `${clampedX}px`;
-    customCursor.style.top = `${fixedY}px`;
+
+    if (document.getElementById("custom-cursor")) {
+        const customCursor = document.getElementById("custom-cursor");
+        customCursor.style.left = `${clampedX}px`;
+        customCursor.style.top = `${fixedY}px`;
+    }
+
+    if (document.querySelector('.spotLight')) {
+        const spotCenter = document.querySelector('.spotLight');
+        spotCenter.style.left = `${clampedX}px`;
+        spotCenter.style.top = `${fixedY}px`;
+    }
 
     // returns the element underneath
     let currentElement = null;
