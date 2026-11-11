@@ -5,7 +5,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+// import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
 
 // setup ----
 
@@ -44,7 +45,7 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Good for sharp text/edges
-renderer.shadowMap.enabled = false; //-------------------SHADOWS DISABLED FOR NOW
+renderer.shadowMap.enabled = true; //-------------------SHADOWS DISABLED FOR NOW
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 //// effects composer ----
@@ -54,8 +55,9 @@ composer.addPass(renderPass);
 
 //effects
 const resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
-const bloomPass = new UnrealBloomPass(resolution, 0.04, 0.2, 0.2);
-composer.addPass(bloomPass);
+// const bloomPass = new UnrealBloomPass(resolution, 0.04, 0.2, 0.2);
+// composer.addPass(bloomPass);
+
 
 const outputPass = new OutputPass()
 composer.addPass(outputPass);
@@ -89,7 +91,7 @@ async function loadAndRunModels() {
     try {
 
         //load blender scene from gltf
-        const gltf = await gltfLoader.loadAsync('assets/workbench-gltf-IBGIII/workbenchIIIscenes.glb');
+        const gltf = await gltfLoader.loadAsync('assets/workbench-gltf-IBGIII/workbenchIIIscenes-textured-nolight.glb');
         workbenchModel = gltf.scene // places the scene in the array and not the raw gltf data
 
         let objs = []
@@ -113,8 +115,24 @@ function addAndRun(loadedObjsArray) {
 
     if (workbenchScene) {
         let workbenchMesh = workbenchScene.children.find(child => child.isMesh);
-        workbenchMesh.castShadow = true;
-        workbenchMesh.receiveShadow = true;
+        workbenchScene.traverse((object) => {
+            if (object.isMesh) {
+                object.castShadow = true;
+                object.receiveShadow = true;
+            }
+        });
+
+        workbenchScene.traverse((object) => {
+            if (object.isLight) {
+                object.castShadow = true;
+                object.receiveShadow = true;
+                object.intensity = 1;
+                object.decay = 2;
+                object.distance = 4;
+            }
+        });
+
+
 
         scene.add(workbenchScene);
     }

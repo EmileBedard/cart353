@@ -230,7 +230,7 @@ function saveBikeAnswer(question) {
         window.dispatchEvent(new CustomEvent("three-camera-move", {
             detail: {
                 position: [1.423, 1.497, 6.699], // Replace with the index camera position
-                // onComplete: () => link?.click()
+                onComplete: () => { window.location.href = "index.html" }
             }
         }));
     }
