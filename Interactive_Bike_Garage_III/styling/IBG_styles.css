@@ -263,16 +263,17 @@ body {
     z-index: 1;
     appearance: none;
     width: 100%;
-    height: 15px;
+    height: 13px;
     background: #ffffff58;
     outline: none;
+
 
 }
 
 .progressBar {
     position: absolute;
     height: 15px;
-    width: 10%;
+    width: 0%;
     background: #fff;
     z-index: 0;
     pointer-events: none;
