@@ -295,10 +295,11 @@ body {
     position: absolute;
     top: 30px;
     transform: translateX(-50%);
+    left: 100%;
 }
 
 .value p {
     font-weight: 600;
     font-style: normal;
-    font-size: 30px;
+    font-size: 35px;
 }

@@ -3,6 +3,41 @@ let hoverTimer = null;
 let animationFrameId = null;
 const hoverDuration = 2300; //in milliseconds
 
+// handles mapping of names and values fo each question
+const bikeNames = ['Raleigh Grand Prix', 'Opus Vivace F1', 'Cervelo s1']; // Replace with your choices
+const groupsets = {
+    1: 'SRAM',
+    2: 'Shimano',
+    3: 'Campagnolo'
+};
+
+const bikeAnswers = [];
+
+function getAnswer(questionIndex, slider) {
+    const value = Number(slider.value);
+
+    if (questionIndex === 0) return bikeNames[value - 1];
+    if (questionIndex === 1) return value;
+    if (questionIndex === 2) return groupsets[value];
+
+    return value;
+}
+
+function updateAnswerDisplay(question, questionIndex, slider) {
+    const output = question.querySelector('.value p');
+    if (output) {
+        output.textContent = String(getAnswer(questionIndex, slider));
+    }
+}
+
+const idleDelay = 250; // wait this long after movement before starting dwell
+let bikeQuestions = [];
+let questionIndex = 0;
+let idleTimer = null;
+let dwellFrame = null;
+let dwellStartedAt = null;
+let lastX = null;
+
 // start is used for animations
 let start = null;
 
@@ -15,22 +50,22 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(customCursor);
         updateCursorPosition(600);
     }
+
     const isIDpage = window.location.pathname.includes('bike_id.html');
     if (isIDpage) {
-        console.log("id page detected")
-        updateCursorPosition(600);
+        initializeBikeQuestions();
     }
 
     //PROTOTYPING calls updateCursorPosition(xPos) with browsers mouseX position. will be commented when the IMU is implemented
-    document.addEventListener('mousemove', function (event) {
-        let mouseX = event.clientX;
-        updateCursorPosition(mouseX);
+    document.addEventListener('mousemove', (event) => {
+        updateCursorPosition(event.clientX);
+
+        if (isIDpage) {
+            handleBikeCursorMove(event.clientX);
+        }
     });
 
 });
-
-
-
 
 // here this functions needs to be called by the data updates from the imu passing from the websocket. the xPos parameter here will be the data from the imu used to control the pointer.
 function updateCursorPosition(xPos) {
@@ -68,25 +103,6 @@ function updateCursorPosition(xPos) {
         }
     }
 
-    //bikeId page cursor logic
-    const isIDpage = window.location.pathname.includes('bike_id.html');
-    if (isIDpage) {
-        const minX = 100;
-        const maxX = window.innerWidth - 100;
-        let xPerctange = reMap(xPos, minX, maxX, 0, 100);
-        console.log(xPerctange);
-
-        const slider = document.querySelector('.question:not([hidden]) .slider');
-        if (slider instanceof HTMLInputElement) {
-            const rect = slider.getBoundingClientRect();
-            const fraction = Math.max(0, Math.min(1, (xPos - rect.left) / rect.width));
-            const min = Number(slider.min);
-            const max = Number(slider.max);
-
-            slider.value = String(min + fraction * (max - min));
-        }
-
-    }
 
 }
 
@@ -116,8 +132,6 @@ function handleHoverLogic(newTarget) {
 
 }
 
-
-
 //used to animate the selectable shapes
 function animateProgress(target, timestamp) {
     if (target !== currentTargetElement) return;
@@ -139,6 +153,89 @@ function animateProgress(target, timestamp) {
     }
 }
 
+function initializeBikeQuestions() {
+    bikeQuestions = [...document.querySelectorAll('.question')];
+    bikeQuestions.forEach((question, index) => {
+        question.hidden = index !== 0;
+    });
+}
+
+function updateBikeSlider(x) {
+    const question = bikeQuestions[questionIndex];
+    const valueText = question?.querySelector('.value')
+    const slider = question?.querySelector('.slider');
+    if (!slider || !valueText) return;
+
+    const rect = slider.getBoundingClientRect();
+    const fraction = Math.max(0, Math.min(1, (x - rect.left) / rect.width));
+    const min = Number(slider.min);
+    const max = Number(slider.max);
+    slider.value = String(Math.round(min + fraction * (max - min)));
+
+    let valueTextPos = reMap(fraction, 0, 1, 0, 100);
+    valueText.style.left = `${valueTextPos}%`;
+    updateAnswerDisplay(question, questionIndex, slider);
+
+}
+
+function handleBikeCursorMove(x) {
+    updateBikeSlider(x);
+
+    if (lastX !== null && Math.abs(x - lastX) < 2) return;
+    lastX = x;
+
+    clearTimeout(idleTimer);
+    cancelAnimationFrame(dwellFrame);
+    dwellStartedAt = null;
+
+    const question = bikeQuestions[questionIndex];
+    const progressBar = question?.querySelector('.progressBar');
+    if (!question || !progressBar) return; //making sure we have these elements before going further
+
+    progressBar.style.width = '0%';
+
+    idleTimer = setTimeout(() => {
+        const tick = (timestamp) => {
+            if (dwellStartedAt === null) dwellStartedAt = timestamp;
+
+            const progress = Math.min((timestamp - dwellStartedAt) / hoverDuration, 1);
+            progressBar.style.width = `${progress * 100}%`;
+
+            if (progress === 1) {
+                saveBikeAnswer(question);
+            } else {
+                dwellFrame = requestAnimationFrame(tick);
+            }
+        };
+
+        dwellFrame = requestAnimationFrame(tick);
+    }, idleDelay);
+}
+
+function saveBikeAnswer(question) {
+    const slider = question.querySelector('.slider');
+    const keys = ['bikeName', 'speeds', 'groupset'];
+    // const link = 
+
+    if (!(slider instanceof HTMLInputElement)) return;
+
+    bikeAnswers[questionIndex] = getAnswer(questionIndex, slider);
+    question.hidden = true;
+    questionIndex++;
+
+    if (questionIndex < bikeQuestions.length) {
+        bikeQuestions[questionIndex].hidden = false;
+    } else {
+        console.log('Bike ID answers:', bikeAnswers);
+        window.dispatchEvent(new CustomEvent("three-camera-move", {
+            detail: {
+                position: [1.423, 1.497, 6.699], // Replace with the index camera position
+                // onComplete: () => link?.click()
+            }
+        }));
+    }
+}
+
 
 function triggerDwellClick(element) {
     if (element !== currentTargetElement) return;
@@ -147,6 +244,7 @@ function triggerDwellClick(element) {
     hideElements(element);
     currentTargetElement = null;
     const link = element.closest("a");
+    console.log(link)
 
     if (element.closest("#bike-id-button")) {
         window.dispatchEvent(new CustomEvent("three-camera-move", {
