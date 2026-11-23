@@ -34,7 +34,6 @@
     pointer-events: none;
     background: black;
     transform: translate(-50%, -50%);
-
     mask-image: radial-gradient(transparent 10%, black 18%)
 }
 

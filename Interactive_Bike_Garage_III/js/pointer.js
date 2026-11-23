@@ -4,12 +4,13 @@ let animationFrameId = null;
 const hoverDuration = 2300; //in milliseconds
 
 // handles mapping of names and values fo each question
-const bikeNames = ['Raleigh Grand Prix', 'Opus Vivace F1', 'Cervelo s1']; // Replace with your choices
+const bikeNames = ['Raleigh Grand Prix', 'Opus Vivace F1', 'Cervelo s1'];
 const groupsets = {
     1: 'SRAM',
     2: 'Shimano',
     3: 'Campagnolo'
 };
+const bikeSpeeds = ['Single Speed', '3 speeds', '6 speeds', '7 speeds', '8 speeds', '11 speeds', '12 speeds', '14 speeds', '18 speeds', '21 speeds', '24 speeds',]
 
 const bikeAnswers = [];
 
@@ -17,7 +18,7 @@ function getAnswer(questionIndex, slider) {
     const value = Number(slider.value);
 
     if (questionIndex === 0) return bikeNames[value - 1];
-    if (questionIndex === 1) return value;
+    if (questionIndex === 1) return bikeSpeeds[value - 1];
     if (questionIndex === 2) return groupsets[value];
 
     return value;
