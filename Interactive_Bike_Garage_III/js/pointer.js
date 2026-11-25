@@ -29,7 +29,7 @@ function updateAnswerDisplay(question, questionIndex, slider) {
     if (output) {
         output.textContent = String(getAnswer(questionIndex, slider));
     }
-}
+};
 
 const idleDelay = 250; // wait this long after movement before starting dwell
 let bikeQuestions = [];
