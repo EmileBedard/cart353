@@ -44,24 +44,32 @@ let start = null;
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    const isIndexpage = window.location.pathname.includes('index.html');
-    if (isIndexpage) {
+    const isIndexPage = window.location.pathname.includes('index.html');
+    if (isIndexPage) {
         const customCursor = document.createElement("div");
         customCursor.id = "custom-cursor";
         document.body.appendChild(customCursor);
         updateCursorPosition(600);
     }
 
-    const isIDpage = window.location.pathname.includes('bike_id.html');
-    if (isIDpage) {
+    const isIDPage = window.location.pathname.includes('bike_id.html');
+    if (isIDPage) {
         initializeBikeQuestions();
+    }
+
+    const isMaintenancePage = window.location.pathname.includes('maintenance.html');
+    if (isMaintenancePage) {
+        const customCursor = document.createElement("div");
+        customCursor.id = "custom-cursor";
+        document.body.appendChild(customCursor);
+        updateCursorPosition(600);
     }
 
     //PROTOTYPING calls updateCursorPosition(xPos) with browsers mouseX position. will be commented when the IMU is implemented
     document.addEventListener('mousemove', (event) => {
         updateCursorPosition(event.clientX);
 
-        if (isIDpage) {
+        if (isIDPage) {
             handleBikeCursorMove(event.clientX);
         }
     });
@@ -73,9 +81,41 @@ function updateCursorPosition(xPos) {
 
     //index page cursor logic
     const isIndexpage = window.location.pathname.includes('index.html');
+    const isMaintenancepage = window.location.pathname.includes('maintenance.html');
+
     if (isIndexpage) {
         const minX = 500;
         const maxX = window.innerWidth - 500;
+        //clampedX outputs the position of the cursor limited to minX and maxX. Math.min outputs the min from the sequence and Math.max does similarly with maximum value
+        const clampedX = Math.max(minX, Math.min(maxX, xPos));
+        const fixedY = window.innerHeight / 2;
+
+        if (document.querySelector('.spotLight')) {
+            const spotCenter = document.querySelector('.spotLight');
+            spotCenter.style.left = `${clampedX}px`;
+            spotCenter.style.top = `${fixedY}px`;
+        }
+
+        if (document.getElementById("custom-cursor")) {
+            const customCursor = document.getElementById("custom-cursor");
+            customCursor.style.left = `${clampedX}px`;
+            customCursor.style.top = `${fixedY}px`;
+        }
+
+        // returns the element underneath
+        let currentElement = null;
+        const elementAtPoint = document.elementFromPoint(clampedX, fixedY);
+
+        if (currentElement !== elementAtPoint) {
+            currentElement = elementAtPoint;
+            const interactiveElement = currentElement?.closest('button, a, .clickable, circle');
+            handleHoverLogic(interactiveElement);
+
+        }
+    }
+    if (isMaintenancepage) {
+        const minX = 50;
+        const maxX = window.innerWidth - 50;
         //clampedX outputs the position of the cursor limited to minX and maxX. Math.min outputs the min from the sequence and Math.max does similarly with maximum value
         const clampedX = Math.max(minX, Math.min(maxX, xPos));
         const fixedY = window.innerHeight / 2;
@@ -84,12 +124,6 @@ function updateCursorPosition(xPos) {
             const customCursor = document.getElementById("custom-cursor");
             customCursor.style.left = `${clampedX}px`;
             customCursor.style.top = `${fixedY}px`;
-        }
-
-        if (document.querySelector('.spotLight')) {
-            const spotCenter = document.querySelector('.spotLight');
-            spotCenter.style.left = `${clampedX}px`;
-            spotCenter.style.top = `${fixedY}px`;
         }
 
         // returns the element underneath
@@ -105,9 +139,41 @@ function updateCursorPosition(xPos) {
     }
 
 
+
+
 }
 
 function handleHoverLogic(newTarget) {
+    //animation logics to be triggered for the three.js scene
+    //index animations
+    const wasOnId = currentTargetElement?.closest("#bike-id-button");
+    const isOnId = newTarget?.closest("#bike-id-button");
+    if (wasOnId !== isOnId) {
+        window.dispatchEvent(new CustomEvent("id-anim", { detail: !!isOnId }));
+    }
+    const wasOnMaintenance = currentTargetElement?.closest("#maintenance-button");
+    const isOnMaintenance = newTarget?.closest("#maintenance-button");
+    if (wasOnMaintenance !== isOnMaintenance) {
+        window.dispatchEvent(new CustomEvent("maintenance-anim", { detail: !!isOnMaintenance }));
+    }
+
+    //maintenance animations
+    const wasOnChain = currentTargetElement?.closest("#chain-button");
+    const isOnChain = newTarget?.closest("#chain-button");
+    if (wasOnChain !== isOnChain) {
+        window.dispatchEvent(new CustomEvent("chain-anim", { detail: !!isOnChain }));
+    }
+    const wasOninnertube = currentTargetElement?.closest("#innertube-button");
+    const isOninnertube = newTarget?.closest("#innertube-button");
+    if (wasOninnertube !== isOninnertube) {
+        window.dispatchEvent(new CustomEvent("innertube-anim", { detail: !!isOninnertube }));
+    }
+    const wasOnpads = currentTargetElement?.closest("#pads-button");
+    const isOnpads = newTarget?.closest("#pads-button");
+    if (wasOnpads !== isOnpads) {
+        window.dispatchEvent(new CustomEvent("pads-anim", { detail: !!isOnpads }));
+    }
+
     const textElement = document.getElementById
 
     if (newTarget !== currentTargetElement) {
@@ -251,7 +317,7 @@ function triggerDwellClick(element) {
         window.dispatchEvent(new CustomEvent("three-camera-move", {
             detail: {
                 position: [-24, 1.1, 9], // Replace with the destination camera position
-                // onComplete: () => link?.click()
+                onComplete: () => link?.click()
             }
         }));
     }
@@ -259,7 +325,7 @@ function triggerDwellClick(element) {
         window.dispatchEvent(new CustomEvent("three-camera-move", {
             detail: {
                 position: [28, 1.1, 8], // Replace with the destination camera position
-                // onComplete: () => link?.click()
+                onComplete: () => link?.click()
             }
         }));
     }

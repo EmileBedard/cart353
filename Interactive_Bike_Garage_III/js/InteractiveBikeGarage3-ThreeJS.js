@@ -79,10 +79,11 @@ controls.update();
 
 const keyLight = new THREE.DirectionalLight(0xffffff, 3);
 keyLight.position.set(0, 15, 3); // XYZ X:left to right Y: bottom to up Z: background to foreground
+//light shadow settings
 keyLight.castShadow = true;
 keyLight.shadow.mapSize.set(2048, 2048);
-keyLight.shadow.camera.left = -30;
-keyLight.shadow.camera.right = 30;
+keyLight.shadow.camera.left = -50;
+keyLight.shadow.camera.right = 50;
 keyLight.shadow.camera.top = 30;
 keyLight.shadow.camera.bottom = -30;
 keyLight.shadow.camera.near = 0.5;
@@ -95,21 +96,19 @@ scene.add(keyLight);
 
 // Main Scene ----
 // add gltf model
-
 let workbenchModel = null;
+let sceneAnimations = null;
+let gltf = null;
+
 
 loadAndRunModels();
 async function loadAndRunModels() {
     try {
-
         //load blender scene from gltf
-        const gltf = await gltfLoader.loadAsync('assets/workbench-gltf-IBGIII/workbenchIIIscenes.glb');
+        gltf = await gltfLoader.loadAsync('assets/workbench-gltf-IBGIII/workbenchIIIscenes-v2.glb');
         workbenchModel = gltf.scene // places the scene in the array and not the raw gltf data
-
-        let objs = []
-        objs.push(workbenchModel);
-
-        addAndRun(objs);
+        sceneAnimations = gltf.animations
+        addAndRun(workbenchModel, sceneAnimations);
     }
     catch (error) {
         console.log(error.message)
@@ -118,81 +117,23 @@ async function loadAndRunModels() {
 
 const originalBlenderPos = new THREE.Vector3();
 
-function convertToStandardMaterial(material) {
-    if (material.isMeshStandardMaterial) {
-        return material;
-    }
-
-    const standardMaterial = new THREE.MeshStandardMaterial({
-        name: material.name,
-        map: material.map,
-        normalMap: material.normalMap,
-        bumpMap: material.bumpMap,
-        roughnessMap: material.roughnessMap,
-        metalnessMap: material.metalnessMap,
-        aoMap: material.aoMap,
-        emissiveMap: material.emissiveMap,
-        alphaMap: material.alphaMap,
-        envMap: material.envMap,
-        side: material.side,
-        transparent: material.transparent,
-        opacity: material.opacity,
-        alphaTest: material.alphaTest,
-        depthWrite: material.depthWrite,
-        depthTest: material.depthTest,
-        vertexColors: material.vertexColors,
-        fog: material.fog,
-        wireframe: material.wireframe,
-    });
-
-    if (material.color) {
-        standardMaterial.color.copy(material.color);
-    }
-    if (material.emissive) {
-        standardMaterial.emissive.copy(material.emissive);
-        standardMaterial.emissiveIntensity = material.emissiveIntensity;
-    }
-
-    standardMaterial.roughness = 0.75;
-    standardMaterial.metalness = 0.1;
-    standardMaterial.bumpScale = material.bumpScale;
-    standardMaterial.userData = material.userData;
-
-    material.dispose();
-    return standardMaterial;
-}
-
 
 //// main run function ----
-function addAndRun(loadedObjsArray) {
+function addAndRun(loadedObjsArray, animations) {
 
     //workbench main scene
-    const workbenchScene = loadedObjsArray[0];
+    const workbenchScene = loadedObjsArray;
 
+    //apply shadows to all mesh objects inside scene
     if (workbenchScene) {
         let workbenchMesh = workbenchScene.children.find(child => child.isMesh);
         workbenchScene.traverse((object) => {
             if (object.isMesh) {
                 object.castShadow = true;
                 object.receiveShadow = true;
-                if (Array.isArray(object.material)) {
-                    object.material = object.material.map(convertToStandardMaterial);
-                } else if (object.material) {
-                    object.material = convertToStandardMaterial(object.material);
-                }
+
             }
         });
-
-        workbenchScene.traverse((object) => {
-            if (object.isLight) {
-                object.castShadow = true;
-                object.receiveShadow = true;
-                object.intensity = 1;
-                object.decay = 2;
-                object.distance = 4;
-            }
-        });
-
 
 
         scene.add(workbenchScene);
@@ -261,8 +202,75 @@ function addAndRun(loadedObjsArray) {
         requestAnimationFrame(animateCamera);
     });
 
+    // animations----
+
+    //index mixers
+    const bikeidMixer = new THREE.AnimationMixer(workbenchScene);
+    const maintenanceMixer = new THREE.AnimationMixer(workbenchScene);
+
+    //maintenance mixers
+    const innertubeMixer = new THREE.AnimationMixer(workbenchScene);
+    const chainMixer = new THREE.AnimationMixer(workbenchScene);
+    const padsMixer = new THREE.AnimationMixer(workbenchScene);
 
 
+    // Access bike id + maintenance animation for main page
+    const idClip = animations.find(clip => clip.name === "bikeid");
+    const bikeIdAnim = bikeidMixer.clipAction(idClip);
+    const maintenanceClip = animations.find(clip => clip.name === "maintenance");
+    const maintenanceAnim = maintenanceMixer.clipAction(maintenanceClip);
+
+    bikeIdAnim.setLoop(THREE.LoopOnce);
+    bikeIdAnim.repetitions = 1000;
+    bikeIdAnim.clampWhenFinished = true;
+    maintenanceAnim.setLoop(THREE.LoopOnce);
+    maintenanceAnim.repetitions = 1000;
+    maintenanceAnim.clampWhenFinished = true;
+
+    window.addEventListener("id-anim", ({ detail: hovered }) => {
+        bikeIdAnim.timeScale = hovered ? 1 : -1;
+        bikeIdAnim.paused = false;
+        bikeIdAnim.play();
+    });
+    window.addEventListener("maintenance-anim", ({ detail: hovered }) => {
+        maintenanceAnim.timeScale = hovered ? 1 : -1;
+        maintenanceAnim.paused = false;
+        maintenanceAnim.play();
+    });
+
+    // Access pads,chain and tube animations for maintenance page
+    const padsClip = animations.find(clip => clip.name === "pads");
+    const padsAnim = padsMixer.clipAction(padsClip);
+    const chainClip = animations.find(clip => clip.name === "chain");
+    const chainAnim = chainMixer.clipAction(chainClip);
+    const innertubeClip = animations.find(clip => clip.name === "innertube");
+    const innertubeAnim = innertubeMixer.clipAction(innertubeClip);
+
+    padsAnim.setLoop(THREE.LoopOnce);
+    padsAnim.repetitions = 1000;
+    padsAnim.clampWhenFinished = true;
+    chainAnim.setLoop(THREE.LoopOnce);
+    chainAnim.repetitions = 1000;
+    chainAnim.clampWhenFinished = true;
+    innertubeAnim.setLoop(THREE.LoopOnce);
+    innertubeAnim.repetitions = 1000;
+    innertubeAnim.clampWhenFinished = true;
+
+    window.addEventListener("pads-anim", ({ detail: hovered }) => {
+        padsAnim.timeScale = hovered ? 1 : -1;
+        padsAnim.paused = false;
+        padsAnim.play();
+    });
+    window.addEventListener("chain-anim", ({ detail: hovered }) => {
+        chainAnim.timeScale = hovered ? 1 : -1;
+        chainAnim.paused = false;
+        chainAnim.play();
+    });
+    window.addEventListener("innertube-anim", ({ detail: hovered }) => {
+        innertubeAnim.timeScale = hovered ? 1 : -1;
+        innertubeAnim.paused = false;
+        innertubeAnim.play();
+    });
 
 
     let elapsedTime = 0;
@@ -274,6 +282,16 @@ function addAndRun(loadedObjsArray) {
         let deltaTime = (timer - elapsedTime) / 1000; //put in secs
         elapsedTime = timer; //update  new elapsedTime
         controls.update();
+
+        //animation mixers
+        if (bikeidMixer || maintenanceMixer || padsMixer || innertubeMixer || chainMixer) {
+            bikeidMixer.update(deltaTime);
+            maintenanceMixer.update(deltaTime);
+            padsMixer.update(deltaTime);
+            innertubeMixer.update(deltaTime);
+            chainMixer.update(deltaTime);
+        }
+
         composer.render();
         window.requestAnimationFrame(animate);
     }
