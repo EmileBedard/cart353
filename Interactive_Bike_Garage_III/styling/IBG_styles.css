@@ -27,8 +27,8 @@
 /* spot light overlays for the 3 pages */
 .spotLight {
     position: fixed;
-    width: 4000px;
-    height: 4000px;
+    width: 5300px;
+    height: 5300px;
     inset: 0;
     z-index: 20;
     pointer-events: none;
@@ -97,7 +97,7 @@
 }
 
 .button p.hover-active {
-    letter-spacing: 0.2em;
+    letter-spacing: 0.3em;
     transition: 0.4s ease;
 }
 
@@ -110,7 +110,7 @@
 .svg-circle {
     cx: 50%;
     cy: 50%;
-    r: 220px;
+    r: 290px;
     stroke: white;
     stroke-width: 5;
     fill: transparent;
@@ -120,9 +120,8 @@
 }
 
 .svg-circle.hover-active {
-    r: 230px;
-    letter-spacing: 0.2em;
-    stroke-width: 10;
+    r: 295px;
+    stroke-width: 7;
 
 }
 
@@ -135,7 +134,7 @@
     transform: translate(-50%, -50%);
     color: #fff;
     font-family: "Seven Points", monospace;
-    font-size: 3em;
+    font-size: 4em;
     letter-spacing: 0.1em;
 }
 
@@ -145,8 +144,8 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    width: 20px;
-    height: 20px;
+    width: 10px;
+    height: 10px;
     background-color: black;
     border-radius: 50%;
     pointer-events: none;
@@ -158,11 +157,12 @@
 /* Circular Map Widget Container */
 #map-circle-container {
     position: relative;
-    top: auto;
-    left: 3.7vw;
-    transform: none;
-    width: 500px;
-    height: 350px;
+    /* top: auto; */
+    /* left: 0%; */
+    right: 0%;
+    /* transform: none; */
+    width: 100%;
+    height: 500px;
     border-radius: 50%;
     overflow: hidden;
     box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6);
@@ -176,14 +176,16 @@
     height: 100%;
 }
 
+/* for three.js */
 #canvas-container {
     position: absolute;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 0;
+
     /* needs to be positive for it to be controllable by the prototyping 3d perspective camera in three.js */
+    z-index: 0;
 }
 
 /* styling for the map's popups */
@@ -313,10 +315,10 @@ body {
     font-size: 35px;
 }
 
-#bike-label {
+/* #bike-label {
     display: none;
     z-index: 30;
-}
+} */
 
 @media print {
     @page {
@@ -330,21 +332,74 @@ body {
         display: none !important;
     }
 
+
     #bike-label {
-        display: block;
+        display: block !important;
+        position: relative;
+        width: 76mm;
+        height: 101mm;
+        overflow: hidden;
         box-sizing: border-box;
-        width: 100%;
-        height: 100%;
-        padding: 5mm;
-        border: 0.7mm solid black;
-        border-radius: 6mm;
-        color: black;
-        font: 10pt monospace;
+        font-family: "Space Mono", monospace;
+        font-style: bold;
+        color: #000;
     }
 
-    #bike-label svg {
-        display: block;
-        width: 80%;
-        margin: 0 auto 8mm;
+    #bike-label .label-artwork {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
     }
+
+    #bike-label .label-artwork {
+        position: absolute;
+        z-index: 0;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .label-data {
+        font-family: "Space Mono", monospace;
+        font-size: 10pt;
+        font-weight: bold;
+        white-space: nowrap;
+        position: absolute;
+        z-index: 3;
+
+    }
+
+    #label-name {
+        left: 106px;
+        top: 78px;
+    }
+
+    #label-speeds {
+        left: 125px;
+        top: 93px;
+    }
+
+    #label-groupset {
+        left: 139px;
+        top: 108px;
+    }
+
+    #barcode-name {
+        font-size: 10pt;
+        transform-origin: 0px 0px;
+        transform: rotate(90deg);
+
+        left: 260px;
+        top: 255px;
+    }
+
+    #sentence-speed-groupset {
+        transform-origin: 0px 0px;
+        transform: rotate(90deg);
+        left: 40px;
+        top: 145px;
+    }
+
+
 }

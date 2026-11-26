@@ -1,10 +1,10 @@
 let currentTargetElement = null;
 let hoverTimer = null;
 let animationFrameId = null;
-const hoverDuration = 2300; //in milliseconds
+const hoverDuration = 300; //in milliseconds // set back to 2300 after
 
 // handles mapping of names and values fo each question
-const bikeNames = ['Raleigh Grand Prix', 'Opus Vivace F1', 'Cervelo s1'];
+const bikeNames = ['Raleigh Grand Prix', 'Trek Domane', 'X-LAB RS7', 'Canyon Aeroad', 'Van-Rysel CFR', 'Marinoni Piuma Supreme', 'Pinarello Dogma', 'Specialized Tarmac', 'Argon 18 Krypton', 'Opus Vivace F1', 'Cervelo R5'];
 const groupsets = {
     1: 'SRAM',
     2: 'Shimano',
@@ -84,8 +84,8 @@ function updateCursorPosition(xPos) {
     const isMaintenancepage = window.location.pathname.includes('maintenance.html');
 
     if (isIndexpage) {
-        const minX = 500;
-        const maxX = window.innerWidth - 500;
+        const minX = 690;
+        const maxX = window.innerWidth - 690;
         //clampedX outputs the position of the cursor limited to minX and maxX. Math.min outputs the min from the sequence and Math.max does similarly with maximum value
         const clampedX = Math.max(minX, Math.min(maxX, xPos));
         const fixedY = window.innerHeight / 2;
@@ -174,7 +174,6 @@ function handleHoverLogic(newTarget) {
         window.dispatchEvent(new CustomEvent("pads-anim", { detail: !!isOnpads }));
     }
 
-    const textElement = document.getElementById
 
     if (newTarget !== currentTargetElement) {
         resetHoverTimer();
@@ -297,44 +296,63 @@ function saveBikeAnswer(question) {
 
         //send the answers to the printer
         printBikeLabel();
+        window.location.href = "bike_id.html" // remove this line after prototyping
 
-        // window.dispatchEvent(new CustomEvent("three-camera-move", {
-        //     detail: {
-        //         position: [1.423, 1.497, 6.699], // Replace with the index camera position
-        //         onComplete: () => { window.location.href = "index.html" }
-        //     }
-        // }));
+        window.dispatchEvent(new CustomEvent("three-camera-move", {
+            detail: {
+                position: [1.423, 1.497, 6.699], // Replace with the index camera position
+                onComplete: () => { window.location.href = "index.html" }
+            }
+        }));
     }
 
 }
 
+function printBikeLabel() {
 
+    document.getElementById("label-name").textContent = bikeAnswers[0];
+    document.getElementById("label-speeds").textContent = bikeAnswers[1];
+    document.getElementById("label-groupset").textContent = bikeAnswers[2];
+
+    document.getElementById("barcode-name").textContent = bikeAnswers[0];
+    document.getElementById("sentence-speed-groupset").textContent = `${bikeAnswers[1]},${bikeAnswers[2]} group`;
+
+    window.print();
+}
 
 function triggerDwellClick(element) {
-    if (element !== currentTargetElement) return;
-    console.log(element)
-    resetHoverTimer();
-    hideElements(element);
-    currentTargetElement = null;
-    const link = element.closest("a");
-    console.log(link)
+    //checks if it is the same target before proceeding
+    if (element !== currentTargetElement) {
 
-    if (element.closest("#bike-id-button")) {
-        window.dispatchEvent(new CustomEvent("three-camera-move", {
-            detail: {
-                position: [-24, 1.1, 9], // Replace with the destination camera position
-                onComplete: () => link?.click()
-            }
-        }));
+        resetHoverTimer();
+
+        //resets elements and visibility
+        document.querySelector(".main-zone").style.display = "none";
+        currentTargetElement = null;
+
+        const link = element.closest("a");
+
+
+        if (element.closest("#bike-id-button")) {
+            window.dispatchEvent(new CustomEvent("three-camera-move", {
+                detail: {
+                    position: [-24, 1.1, 9], // Replace with the destination camera position
+                    onComplete: () => link?.click()
+                }
+            }));
+        }
+        if (element.closest("#maintenance-button")) {
+            window.dispatchEvent(new CustomEvent("three-camera-move", {
+                detail: {
+                    position: [28, 1.1, 8], // Replace with the destination camera position
+                    onComplete: () => link?.click()
+                }
+            }));
+        }
     }
-    if (element.closest("#maintenance-button")) {
-        window.dispatchEvent(new CustomEvent("three-camera-move", {
-            detail: {
-                position: [28, 1.1, 8], // Replace with the destination camera position
-                onComplete: () => link?.click()
-            }
-        }));
-    }
+    else {
+        return;
+    };
 
 }
 
@@ -358,35 +376,11 @@ function resetHoverTimer() {
     start = null;
 }
 
-function hideElements() {
-    document.querySelector(".main-zone").style.display = "none";
-}
 
-// Source - https://stackoverflow.com/a/23202637
+// Source for reMap function - https://stackoverflow.com/a/23202637
 // Posted by August Miller, modified by community. See post 'Timeline' for change history
 // Retrieved 2026-11-11, License - CC BY-SA 4.0
 
 function reMap(number, inMin, inMax, outMin, outMax) {
     return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
-}
-
-
-// //send the answers to the printer
-// async function sendBikeLabel(answers) {
-//     const response = await fetch("/print-label", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({ answers })
-//     });
-
-//     if (!response.ok) throw new Error(`Print failed: ${response.status}`);
-
-//
-// }
-
-function printBikeLabel() {
-    document.getElementById("label-name").textContent = bikeAnswers[0];
-    document.getElementById("label-speeds").textContent = bikeAnswers[1];
-    document.getElementById("label-groupset").textContent = bikeAnswers[2];
-    window.print();
 }

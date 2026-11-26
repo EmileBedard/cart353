@@ -9,8 +9,6 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 
 // setup ----
-
-
 //// gltf loader ----
 const gltfLoader = new GLTFLoader();
 
@@ -55,28 +53,11 @@ const composer = new EffectComposer(renderer);
 const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 
-//effects
-const resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
-// const bloomPass = new UnrealBloomPass(resolution, 0.04, 0.2, 0.2);
-// composer.addPass(bloomPass);
-
-
-const outputPass = new OutputPass()
-composer.addPass(outputPass);
-
-// used to resize blendercamera in browser if resizing occurs
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-});
-
 // prototyping orbit controls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.update();
 
 // lighting
-
 const keyLight = new THREE.DirectionalLight(0xffffff, 3);
 keyLight.position.set(0, 15, 3); // XYZ X:left to right Y: bottom to up Z: background to foreground
 //light shadow settings
@@ -93,13 +74,11 @@ keyLight.shadow.normalBias = 0.02;
 keyLight.shadow.radius = 8;
 scene.add(keyLight);
 
-
 // Main Scene ----
 // add gltf model
 let workbenchModel = null;
 let sceneAnimations = null;
 let gltf = null;
-
 
 loadAndRunModels();
 async function loadAndRunModels() {
@@ -114,9 +93,6 @@ async function loadAndRunModels() {
         console.log(error.message)
     }
 }
-
-const originalBlenderPos = new THREE.Vector3();
-
 
 //// main run function ----
 function addAndRun(loadedObjsArray, animations) {
@@ -141,6 +117,7 @@ function addAndRun(loadedObjsArray, animations) {
 
     ////camera from blender----
     let blenderCamera = workbenchScene.children.find(child => child.isCamera);
+    const originalBlenderPos = new THREE.Vector3();
 
     //change between initial and blender cam here
     //prototyping camera enter: camera
@@ -271,7 +248,6 @@ function addAndRun(loadedObjsArray, animations) {
         innertubeAnim.paused = false;
         innertubeAnim.play();
     });
-
 
     let elapsedTime = 0;
     window.requestAnimationFrame(animate);
