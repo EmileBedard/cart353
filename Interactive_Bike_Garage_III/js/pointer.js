@@ -280,9 +280,9 @@ function handleBikeCursorMove(x) {
 }
 
 function saveBikeAnswer(question) {
+
     const slider = question.querySelector('.slider');
     const keys = ['bikeName', 'speeds', 'groupset'];
-    // const link = 
 
     if (!(slider instanceof HTMLInputElement)) return;
 
@@ -294,14 +294,20 @@ function saveBikeAnswer(question) {
         bikeQuestions[questionIndex].hidden = false;
     } else {
         console.log('Bike ID answers:', bikeAnswers);
-        window.dispatchEvent(new CustomEvent("three-camera-move", {
-            detail: {
-                position: [1.423, 1.497, 6.699], // Replace with the index camera position
-                onComplete: () => { window.location.href = "index.html" }
-            }
-        }));
+
+        //send the answers to the printer
+        printBikeLabel();
+
+        // window.dispatchEvent(new CustomEvent("three-camera-move", {
+        //     detail: {
+        //         position: [1.423, 1.497, 6.699], // Replace with the index camera position
+        //         onComplete: () => { window.location.href = "index.html" }
+        //     }
+        // }));
     }
+
 }
+
 
 
 function triggerDwellClick(element) {
@@ -362,4 +368,25 @@ function hideElements() {
 
 function reMap(number, inMin, inMax, outMin, outMax) {
     return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+}
+
+
+// //send the answers to the printer
+// async function sendBikeLabel(answers) {
+//     const response = await fetch("/print-label", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ answers })
+//     });
+
+//     if (!response.ok) throw new Error(`Print failed: ${response.status}`);
+
+//
+// }
+
+function printBikeLabel() {
+    document.getElementById("label-name").textContent = bikeAnswers[0];
+    document.getElementById("label-speeds").textContent = bikeAnswers[1];
+    document.getElementById("label-groupset").textContent = bikeAnswers[2];
+    window.print();
 }

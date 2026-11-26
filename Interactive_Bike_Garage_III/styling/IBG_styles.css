@@ -312,3 +312,39 @@ body {
     font-style: normal;
     font-size: 35px;
 }
+
+#bike-label {
+    display: none;
+    z-index: 30;
+}
+
+@media print {
+    @page {
+        size: 76mm 101mm;
+        margin: 0;
+    }
+
+    /* Change to your label size. */
+
+    body>*:not(#bike-label) {
+        display: none !important;
+    }
+
+    #bike-label {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        padding: 5mm;
+        border: 0.7mm solid black;
+        border-radius: 6mm;
+        color: black;
+        font: 10pt monospace;
+    }
+
+    #bike-label svg {
+        display: block;
+        width: 80%;
+        margin: 0 auto 8mm;
+    }
+}
