@@ -1,10 +1,10 @@
 let currentTargetElement = null;
 let hoverTimer = null;
 let animationFrameId = null;
-const hoverDuration = 300; //in milliseconds // set back to 2300 after
+const hoverDuration = 2300; //in milliseconds // set back to 2300 after prototyping
 
 // handles mapping of names and values fo each question
-const bikeNames = ['Raleigh Grand Prix', 'Trek Domane', 'X-LAB RS7', 'Canyon Aeroad', 'Van-Rysel CFR', 'Marinoni Piuma Supreme', 'Pinarello Dogma', 'Specialized Tarmac', 'Argon 18 Krypton', 'Opus Vivace F1', 'Cervelo R5'];
+const bikeNames = ['Raleigh GP', 'Trek Domane', 'X-LAB RS7', 'Canyon Aeroad', 'Van-Rysel CFR', 'Marinoni Piuma', 'Pinarello Dogma', 'Specialized SL7', 'Argon18 Krypton', 'Opus Vivace F1', 'Cervelo R5'];
 const groupsets = {
     1: 'SRAM',
     2: 'Shimano',
@@ -296,7 +296,6 @@ function saveBikeAnswer(question) {
 
         //send the answers to the printer
         printBikeLabel();
-        window.location.href = "bike_id.html" // remove this line after prototyping
 
         window.dispatchEvent(new CustomEvent("three-camera-move", {
             detail: {
@@ -321,33 +320,91 @@ function printBikeLabel() {
 }
 
 function triggerDwellClick(element) {
+
     //checks if it is the same target before proceeding
-    if (element !== currentTargetElement) {
+    if (element === currentTargetElement) {
 
         resetHoverTimer();
 
         //resets elements and visibility
-        document.querySelector(".main-zone").style.display = "none";
         currentTargetElement = null;
 
         const link = element.closest("a");
 
+        //index page target clicks
+        if (window.location.pathname.includes('index.html')) {
+            document.querySelector(".main-zone").style.display = "none";
 
-        if (element.closest("#bike-id-button")) {
-            window.dispatchEvent(new CustomEvent("three-camera-move", {
-                detail: {
-                    position: [-24, 1.1, 9], // Replace with the destination camera position
-                    onComplete: () => link?.click()
-                }
-            }));
+            if (element.closest("#bike-id-button")) {
+                window.dispatchEvent(new CustomEvent("three-camera-move", {
+                    detail: {
+                        position: [-24, 1.1, 9], // Replace with the destination camera position
+                        onComplete: () => link?.click()
+                    }
+                }));
+            }
+            if (element.closest("#maintenance-button")) {
+                window.dispatchEvent(new CustomEvent("three-camera-move", {
+                    detail: {
+                        position: [28, 1.1, 8], // Replace with the destination camera position
+                        onComplete: () => link?.click()
+                    }
+                }));
+            }
         }
-        if (element.closest("#maintenance-button")) {
-            window.dispatchEvent(new CustomEvent("three-camera-move", {
-                detail: {
-                    position: [28, 1.1, 8], // Replace with the destination camera position
-                    onComplete: () => link?.click()
-                }
-            }));
+
+        //maintenance page target clicks
+        if (window.location.pathname.includes('maintenance.html')) {
+
+            //maintenance imgs popups
+            if (element.closest("#chain-button")) {
+                document.querySelector(".maintenance-main-zone").style.display = "none";
+                document.querySelector(".maintenance-imgs-zone").style.pointerEvents = "all";
+
+                document.getElementById("chain-img").style.display = "block";
+                document.querySelector(".fixed-spotLight").classList.add("fixed-spotLight-dimmed");
+
+                document.getElementById("menu-button").style.visibility = "visible";
+                document.getElementById("return-button").style.visibility = "visible";
+            }
+            if (element.closest("#innertube-button")) {
+                document.querySelector(".maintenance-main-zone").style.display = "none";
+                document.querySelector(".maintenance-imgs-zone").style.pointerEvents = "all";
+
+                document.getElementById("innertube-img").style.display = "block";
+                document.querySelector(".fixed-spotLight").classList.add("fixed-spotLight-dimmed");
+
+                document.getElementById("menu-button").style.visibility = "visible";
+                document.getElementById("return-button").style.visibility = "visible";
+
+            }
+            if (element.closest("#pads-button")) {
+                document.querySelector(".maintenance-main-zone").style.display = "none";
+                document.querySelector(".maintenance-imgs-zone").style.pointerEvents = "all";
+
+                document.getElementById("pads-img").style.display = "block";
+                document.querySelector(".fixed-spotLight").classList.add("fixed-spotLight-dimmed");
+
+                document.getElementById("menu-button").style.visibility = "visible";
+                document.getElementById("return-button").style.visibility = "visible";
+
+            }
+
+            //navigation buttons
+            if (element.closest("#menu-button")) {
+                document.querySelector(".maintenance-imgs-zone").style.display = "none";
+                document.querySelector(".fixed-spotLight").classList.remove("fixed-spotLight-dimmed");
+
+                window.dispatchEvent(new CustomEvent("three-camera-move", {
+                    detail: {
+                        position: [1.423, 1.497, 6.699], // Replace with the index camera position
+                        onComplete: () => link?.click()
+                    }
+                }));
+            }
+            if (element.closest("#return-button")) {
+                link?.click()
+            }
         }
     }
     else {
